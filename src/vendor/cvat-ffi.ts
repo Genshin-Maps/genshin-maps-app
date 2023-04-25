@@ -16,7 +16,7 @@ const string = ref.types.CString;
 const stringPtr = ref.refType(string);
 
 // TODO: 프로덕션 빌드에서 경로 문제 없는지 확인
-export const cvAutoTrack = ffi.Library(path.join(__dirname, "../../../vendor/cvAutoTrack/cvAutoTrack.dll"), {
+export const cvAutoTrack = ffi.Library(path.join(__dirname, "../../vendor/cvAutoTrack/cvAutoTrack.dll"), {
     verison: [bool, [byteArray]],
 
     init: ["bool", []],

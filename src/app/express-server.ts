@@ -1,4 +1,5 @@
 import express, { NextFunction, Request, Response } from "express";
+import cors from "cors";
 import { MapsAppResponse } from "../models/maps-app-response";
 import { processCommand } from "../vendor/cvat";
 import { Command } from "../models/command";
@@ -6,7 +7,13 @@ import { CvatResponse } from "../models/cvat-response";
 
 const app = express();
 const port = 3000;
+const corsOptions = {
+    origin: "https://genshin.gamedot.org",
+    optionsSuccessStatus: 200,
+};
 
+app.use(express.json());
+app.use(cors(corsOptions));
 app.use(function (err: Error, req: Request, res: Response, next: NextFunction) {
     if (res.headersSent) {
         return next(err);
@@ -22,12 +29,11 @@ app.use(function (err: Error, req: Request, res: Response, next: NextFunction) {
             data: 0,
         },
     };
-    res.status(200).json(response);
 
-    return;
+    return res.status(200).json(response);
 });
 
-app.get("/process", (req: Request, res: Response) => {
+app.post("/process", (req: Request, res: Response) => {
     const body: Command = req.body as Command;
     const cvatResponse: CvatResponse = processCommand(body);
 
@@ -36,6 +42,6 @@ app.get("/process", (req: Request, res: Response) => {
 
 export const start = () => {
     app.listen(port, () => {
-        console.log(`Listen : ${port}`);
+        console.log(`Server start on port ${port}`);
     });
 };
