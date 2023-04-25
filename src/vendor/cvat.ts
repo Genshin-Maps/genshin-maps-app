@@ -1,6 +1,9 @@
 import { Pointer, alloc } from "@lwahonen/ref-napi";
 import { Worker, isMainThread, workerData } from "worker_threads";
+import { isNumber, toNumber } from "lodash";
 import { cvAutoTrack } from "./cvat-ffi";
+import { Command } from "../models/command";
+import { CvatResponse } from "../models/cvat-response";
 
 let isBroadcast: boolean = false;
 
@@ -78,25 +81,26 @@ function _threadedTrack() {
     }
 }
 
-export const sub = () => {
+export const sub = (): CvatResponse => {
     return {
         status: _startTrack(),
     };
 };
 
-export const unsub = () => {
+export const unsub = (): CvatResponse => {
     return {
         status: _stopTrack(),
     };
 };
 
-export const track = () => {
+export const track = (): CvatResponse => {
     let x: Pointer<number> = alloc("double*");
     let y: Pointer<number> = alloc("double*");
     let a: Pointer<number> = alloc("double*");
     let r: Pointer<number> = alloc("double*");
     let m: Pointer<number> = alloc("int*");
 
+    // TODO: Pointer에서 값을 빼서 반환해야하는지 확인
     const status = _track(x, y, a, r, m);
     return {
         status: status,
@@ -104,43 +108,43 @@ export const track = () => {
     };
 };
 
-export const init = () => {
+export const init = (): CvatResponse => {
     return {
         status: cvAutoTrack.init(),
     };
 };
 
-export const uninit = () => {
+export const uninit = (): CvatResponse => {
     return {
         status: cvAutoTrack.uninit(),
     };
 };
 
-export const SetHandle = (handler: number) => {
+export const SetHandle = (handler: number): CvatResponse => {
     return {
         status: cvAutoTrack.SetHandle(handler),
     };
 };
 
-export const SetUseDx11CaptureMode = () => {
+export const SetUseDx11CaptureMode = (): CvatResponse => {
     return {
         status: cvAutoTrack.SetUseDx11CaptureMode(),
     };
 };
 
-export const SetUseBitbltCaptureMode = () => {
+export const SetUseBitbltCaptureMode = (): CvatResponse => {
     return {
         status: cvAutoTrack.SetUseBitbltCaptureMode(),
     };
 };
 
-export const SetWorldCenter = (x: number, y: number) => {
+export const SetWorldCenter = (x: number, y: number): CvatResponse => {
     return {
         status: cvAutoTrack.SetWorldCenter(x, y),
     };
 };
 
-export const GetTransform = () => {
+export const GetTransform = (): CvatResponse => {
     let x: Pointer<number> = alloc("double*");
     let y: Pointer<number> = alloc("double*");
     let a: Pointer<number> = alloc("double*");
@@ -153,7 +157,7 @@ export const GetTransform = () => {
     };
 };
 
-export const GetPosition = () => {
+export const GetPosition = (): CvatResponse => {
     let x: Pointer<number> = alloc("double*");
     let y: Pointer<number> = alloc("double*");
     let m: Pointer<number> = alloc("int*");
@@ -165,7 +169,7 @@ export const GetPosition = () => {
     };
 };
 
-export const GetDirection = () => {
+export const GetDirection = (): CvatResponse => {
     let a: Pointer<number> = alloc("double*");
 
     const status = cvAutoTrack.GetDirection(a);
@@ -175,7 +179,7 @@ export const GetDirection = () => {
     };
 };
 
-export const GetRotation = () => {
+export const GetRotation = (): CvatResponse => {
     let a: Pointer<number> = alloc("double*");
 
     const status = cvAutoTrack.GetRotation(a);
@@ -185,12 +189,39 @@ export const GetRotation = () => {
     };
 };
 
-export const GetLastErr = () => {
+export const GetLastErr = (): CvatResponse => {
     return {
         data: cvAutoTrack.GetLastErr(),
     };
 };
 
-export const DebugCaptureRes = () => {
+export const DebugCaptureRes = (): CvatResponse => {
     return {};
+};
+
+export const processCommand = (cmd: Command): CvatResponse => {
+    const action = cmd["action"];
+    const version = isNumber(cmd["version"]) ? toNumber(cmd["version"]) : 0;
+
+    if (action == "sub") {
+        return sub();
+    }
+    if (action == "unsub") {
+        return unsub();
+    }
+    if (action == "track") {
+        return track();
+    }
+    if (action == "init") {
+        return init();
+    }
+    if (action == "uninit") {
+        return uninit();
+    }
+    // TODO: 기타 필요한 action 처리 추가
+
+    return {
+        status: false,
+        data: "Invalid action",
+    };
 };
