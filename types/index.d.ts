@@ -7,3 +7,8 @@ declare module "@lwahonen/ref-napi" {
     import * as ref_napi from "ref-napi";
     export = ref_napi;
 }
+
+type AppInfo = {
+    appVersion: string;
+    libVersion: string;
+}

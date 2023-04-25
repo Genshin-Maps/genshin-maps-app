@@ -1,19 +1,34 @@
 import { app, BrowserWindow, ipcMain, nativeTheme } from "electron";
 import { default as loadExtension } from "./load-extension";
 import { default as loadAutotrack } from "./load-autotrack";
+import { GetCompileVersion } from "./vendor/cvat";
 
+const AppInfo: AppInfo = {
+    appVersion: app.getVersion(),
+    libVersion: GetCompileVersion(),
+}
 // ---
 const createWindow = () => {
     // Create the browser window.
     const win = new BrowserWindow({
         width: 800,
         height: 600,
+        // frame: false,
+        webPreferences: {
+            nodeIntegration: false,
+            contextIsolation: true,
+            preload: __dirname + "/preload.js",
+        }
     });
     win.setMenuBarVisibility(false);
 
     // Load a remote URL
     win.loadURL("https://genshin.gamedot.org/?mid=genshinmaps").then(() => {
         loadExtension(win);
+        setInterval(() => {
+            win.webContents.send('cvatInfo', { version: GetCompileVersion() });
+        }, 5000);
+        
         // loadAutotrack();
     });
 

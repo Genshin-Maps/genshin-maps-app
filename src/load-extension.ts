@@ -47,7 +47,6 @@ export default (win: BrowserWindow) => {
         win.webContents.executeJavaScript(extension_js);
         // TODO:
         // win.webContents.executeJavaScript(gps_js);
-        console.log(GetCompileVersion());
     });
 
     //
