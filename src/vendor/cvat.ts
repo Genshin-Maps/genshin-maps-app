@@ -194,3 +194,9 @@ export const GetLastErr = () => {
 export const DebugCaptureRes = () => {
     return {};
 };
+
+export const GetCompileVersion = (): string => {
+    let str: Pointer<string> = alloc("char*");
+    cvAutoTrack.GetCompileVersion(str, 256);
+    return str.readCString();
+}

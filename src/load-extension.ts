@@ -1,6 +1,7 @@
 import { BrowserWindow } from "electron";
 import { get } from "lodash";
 import { getURLContent } from "./utils/web-utils";
+import { GetCompileVersion } from "./vendor/cvat";
 
 export default (win: BrowserWindow) => {
     const githubRepo = "https://github.com/juhyeon-cha/genshin-maps-extension";
@@ -46,6 +47,7 @@ export default (win: BrowserWindow) => {
         win.webContents.executeJavaScript(extension_js);
         // TODO:
         // win.webContents.executeJavaScript(gps_js);
+        console.log(GetCompileVersion());
     });
 
     //
