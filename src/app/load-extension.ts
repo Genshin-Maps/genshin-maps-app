@@ -1,6 +1,6 @@
 import { BrowserWindow } from "electron";
 import { get } from "lodash";
-import { getURLContent } from "./utils/web-utils";
+import { getURLContent } from "../utils/web-utils";
 
 export default (win: BrowserWindow) => {
     const githubRepo = "https://github.com/juhyeon-cha/genshin-maps-extension";
