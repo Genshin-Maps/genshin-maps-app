@@ -15,12 +15,10 @@ const createWindow = () => {
     win.loadURL("https://genshin.gamedot.org/?mid=genshinmaps").then(() => {
         loadExtension(win);
         loadAutotrack();
+
+        // Open the DevTools.
+        win.webContents.openDevTools();
     });
-
-    // --- Window 이벤트
-
-    // Open the DevTools.
-    win.webContents.openDevTools();
 };
 
 async function start() {
