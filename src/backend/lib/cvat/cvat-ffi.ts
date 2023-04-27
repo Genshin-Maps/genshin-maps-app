@@ -15,6 +15,7 @@ export const string = ref.types.CString;
 export const stringPtr = ref.refType(string);
 
 export function loadCvatLibrary(libPath: string): any {
+    console.log(libPath);
     return ffi.Library(libPath, {
         verison: [bool, [byteArray]],
     

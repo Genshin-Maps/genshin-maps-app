@@ -14,7 +14,7 @@ const createWindow = (): BrowserWindow => {
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true,
-            preload: path.join(app.getAppPath(), process.env.DEBUG ? 'build':'', "renderer/preload.js"),
+            preload: path.join(app.getAppPath(), "build/renderer/preload.js"),
         }
     });
     win.setMenuBarVisibility(false);

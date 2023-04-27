@@ -18,7 +18,6 @@ export class LibCvat {
         if(!LibCvat._instance) LibCvat._instance = new LibCvat();
         return LibCvat._instance;
     }
-
     public load(libPath: string = path.join(app.getAppPath(), "lib/cvAutoTrack/cvAutoTrack.dll")): boolean {
         if(this._lib == null)
             this._lib = loadCvatLibrary(libPath);
