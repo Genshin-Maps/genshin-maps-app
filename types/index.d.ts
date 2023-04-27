@@ -10,5 +10,32 @@ declare module "@lwahonen/ref-napi" {
 
 type AppInfo = {
     appVersion: string;
-    libVersion: string;
+    libVersion?: string;
+}
+
+type AppConfig = {
+    autoAppUpdate: boolean;
+    autoLibUpdate: boolean;
+    captureInterval: number;
+    captureDelayOnError: number;
+    useBitBltCapture: boolean;
+}
+
+type WorkerEvent = {
+    event: string;
+    data: any;
+}
+
+type CvatTrackData = {
+    x: number;
+    y: number;
+    a: number;
+    r: number;
+    m: number;
+    err: CvatTrackError;
+}
+
+type CvatTrackError = {
+    errorCode?: number;
+    errorList?: string[];
 }
