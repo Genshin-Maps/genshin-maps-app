@@ -2,7 +2,7 @@
   "name": "genshin-maps-app",
   "version": "1.0.0",
   "description": "Gamedot genshin maps app using electron.",
-  "main": "build/main.js",
+  "main": "build/backend/main.js",
   "scripts": {
     "compile": "tsc",
     "start": "npm run compile && cross-env DEBUG=true electron-forge start",

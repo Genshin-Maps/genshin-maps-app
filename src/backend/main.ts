@@ -1,6 +1,7 @@
 import { app, BrowserWindow, ipcMain, nativeTheme } from "electron";
 import { default as loadExtension } from "./load-extension";
 import { getAppInfoHandler, getConfigHandler, setConfigHandler, startTrackHandler, stopTrackHandler } from "./handlers";
+import path from 'path';
 
 // ---
 export let mainWindow: BrowserWindow | null = null;
@@ -13,7 +14,7 @@ const createWindow = (): BrowserWindow => {
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true,
-            preload: __dirname + "/preload.js",
+            preload: path.join(app.getAppPath(), process.env.DEBUG ? 'build':'', "renderer/preload.js"),
         }
     });
     win.setMenuBarVisibility(false);

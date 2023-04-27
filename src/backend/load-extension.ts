@@ -40,9 +40,11 @@ export default (win: BrowserWindow) => {
         function GM_setValue() {
             // TODO: 
         }
+        /*
         window.bridge.onTrack((event, info) => {
             console.debug(info);
         });
+        */
         // window.bridge.startTrack();
         `;
         win.webContents.executeJavaScript(globalJS);

@@ -19,9 +19,9 @@ export class CvatWorkerManager {
     }
 
     public init(): boolean {
-        this._worker = new Worker('./build/vendor/trackWorker.js', { 
+        this._worker = new Worker('./build/lib/cvat/worker/trackWorker.js', { 
             workerData: { 
-                libPath: path.join(app.getAppPath(), "vendor/cvAutoTrack/cvAutoTrack.dll"),
+                libPath: path.join(app.getAppPath(), "lib/cvAutoTrack/cvAutoTrack.dll"),
                 config: getConfig()
             }
         });
