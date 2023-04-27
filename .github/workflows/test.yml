@@ -1,0 +1,63 @@
+name: Build Test
+
+on:
+  workflow_dispatch
+
+jobs:
+  build-test:
+    name: build test
+    runs-on: windows-latest
+    timeout-minutes: 60
+    env:
+      CHILD_CONCURRENCY: "1"
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 18
+
+       - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: latest
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - uses: actions/setup-python@v2
+        with:
+          python-version: "2.x"
+
+      - name: Configure MSVS
+        run: pnpm config set msvs_version 2017
+
+      - name: setup node-gyp
+        run: pnpm install -g node-gyp@latest
+
+      - name: Install Dependencies
+        run: pnpm install
+
+      - name: Build Electron App
+        run: pnpm make
+
+      - name: Upload production-ready build files
+        uses: actions/upload-artifact@v2
+        with:
+          name: production-files
+          path: ./out
+
+        
