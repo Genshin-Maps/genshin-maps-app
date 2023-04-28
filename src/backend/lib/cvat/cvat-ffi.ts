@@ -1,4 +1,4 @@
-import ffi, { Library } from "@lwahonen/ffi-napi";
+import ffi from "@lwahonen/ffi-napi";
 import ref from "@lwahonen/ref-napi";
 import array from "ref-array-di";
 
@@ -18,37 +18,37 @@ export function loadCvatLibrary(libPath: string): any {
     console.log(libPath);
     return ffi.Library(libPath, {
         verison: [bool, [byteArray]],
-    
+
         init: ["bool", []],
         uninit: [bool, []],
-    
+
         SetUseBitbltCaptureMode: [bool, []],
         SetUseDx11CaptureMode: [bool, []],
-    
+
         SetHandle: [bool, [long]],
         SetWorldCenter: [bool, [double, double]],
         SetWorldScale: [bool, [double]],
-    
+
         GetTransformOfMap: [bool, [doublePtr, doublePtr, doublePtr, intPtr]],
         GetPositionOfMap: [bool, [doublePtr, doublePtr, intPtr]],
         GetDirection: [bool, [doublePtr]],
         GetRotation: [bool, [doublePtr]],
-    
+
         GetStar: [bool, [doublePtr, doublePtr, boolPtr]],
         GetStarJson: [bool, []],
-    
+
         GetUID: [bool, [intPtr]],
-    
+
         GetInfoLoadPicture: [bool, [byteArray, intPtr, doublePtr, doublePtr, doublePtr]],
         GetInfoLoadVideo: [bool, [byteArray, byteArray]],
-    
+
         GetLastErr: [int, []],
         GetLastErrMsg: [int, [byteArray, int]],
         GetLastErrJson: [int, [stringPtr, int]],
-    
+
         startServe: [bool, []],
         stopServe: [bool, []],
-    
+
         GetCompileVersion: [bool, [stringPtr, int]],
         GetCompileTime: [bool, [byteArray, int]],
     });
