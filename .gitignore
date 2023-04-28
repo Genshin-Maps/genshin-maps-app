@@ -8,4 +8,4 @@ lib/
 *.xml
 
 out/
-build/
+dist/
