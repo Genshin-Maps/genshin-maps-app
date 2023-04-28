@@ -1,8 +1,9 @@
-import { IpcMainInvokeEvent, app, BrowserWindow } from "electron";
-import { getConfig, setConfig } from "./config";
-import { mainWindow } from './main'
-import { CvatWorkerManager } from "./lib/cvat/cvatWorkerManager";
-import { LibCvat } from "./lib/cvat";
+import { IpcMainInvokeEvent, app } from "electron";
+import { AppConfig, AppInfo } from "@t/backend";
+import { mainWindow } from "@/backend";
+import { getConfig, setConfig } from "@/backend/config";
+import { LibCvat } from "@/backend/lib/cvat";
+import { CvatWorkerManager } from "@/backend/lib/cvat/cvatWorkerManager";
 
 const cvat = LibCvat.instance;
 cvat.load();
@@ -11,7 +12,7 @@ export function getAppInfoHandler(): AppInfo {
     return {
         appVersion: app.getVersion(),
         libVersion: cvat.GetCompileVersion(),
-    }
+    };
 }
 
 export function getConfigHandler(): AppConfig {
@@ -28,10 +29,9 @@ export function startTrackHandler(): void {
     libManager.init();
     libManager.startTrack();
     libManager.onTrackData = (data) => {
-        console.log('on track data')
-        if(mainWindow)
-            mainWindow.webContents.send('track', data);
-    }
+        console.log("on track data");
+        if (mainWindow) mainWindow.webContents.send("track", data);
+    };
 }
 
 export function stopTrackHandler(): void {

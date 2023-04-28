@@ -1,6 +1,6 @@
 import { BrowserWindow } from "electron";
 import { get } from "lodash";
-import { getURLContent } from "./lib/utils";
+import { getURLContent } from "@/backend/lib/utils";
 
 export default (win: BrowserWindow) => {
     const githubRepo = "https://github.com/juhyeon-cha/genshin-maps-extension";
@@ -17,7 +17,7 @@ export default (win: BrowserWindow) => {
         const extension_css = get(results[1], "data", "");
         const selectbox_js = get(results[2], "data", "");
         const extension_js = get(results[3], "data", "");
-        const gps_js = get(results[4], "data", "");
+        // const gps_js = get(results[4], "data", "");
 
         const globalJS = `
         function GM_getResourceText(resource_name) {

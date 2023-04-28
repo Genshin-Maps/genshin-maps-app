@@ -1,5 +1,6 @@
-import { LibCvat } from "..";
-const { workerData, parentPort } = require('worker_threads')
+import { workerData, parentPort } from "worker_threads";
+import { AppConfig } from "@t/backend";
+import { LibCvat } from "@/backend/lib/cvat";
 
 const config = workerData.config as AppConfig;
 const Cvat = LibCvat.instance;
@@ -7,32 +8,31 @@ let trackInterval: NodeJS.Timer | null = null;
 
 Cvat.load(workerData.libPath);
 
-
-parentPort.on('message', (message: any) => {
-    if (message === 'exit') {
+parentPort?.on("message", (message: any) => {
+    if (message === "exit") {
         exit();
-    } else if (message === 'track') {
+    } else if (message === "track") {
         startTrack();
-    } else if (message === 'stopTrack') {
+    } else if (message === "stopTrack") {
         stopTrack();
     } else {
-        parentPort.postMessage({ echo: message });
+        parentPort?.postMessage({ echo: message });
     }
 });
 
 function exit() {
-    parentPort.postMessage('called exit');
+    parentPort?.postMessage("called exit");
     stopTrack();
     Cvat.uninit();
     Cvat.unload();
-    parentPort.close();
+    parentPort?.close();
 }
 
 function track(): void {
     let trackData = Cvat.track();
-    parentPort.postMessage({
-        event: 'track',
-        data: trackData
+    parentPort?.postMessage({
+        event: "track",
+        data: trackData,
     });
 }
 
@@ -41,7 +41,6 @@ function startTrack() {
 }
 
 function stopTrack() {
-    if (trackInterval !== null)
-        clearInterval(trackInterval);
+    if (trackInterval !== null) clearInterval(trackInterval);
     trackInterval = null;
 }

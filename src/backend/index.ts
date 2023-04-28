@@ -1,7 +1,8 @@
 import { app, BrowserWindow, ipcMain, nativeTheme } from "electron";
-import { default as loadExtension } from "./load-extension";
-import { getAppInfoHandler, getConfigHandler, setConfigHandler, startTrackHandler, stopTrackHandler } from "./handlers";
-import path from 'path';
+import { is } from "@electron-toolkit/utils";
+import path from "path";
+import { default as loadExtension } from "@/backend/load-extension";
+import { getAppInfoHandler, getConfigHandler, setConfigHandler, startTrackHandler, stopTrackHandler } from "@/backend/handlers";
 
 // ---
 export let mainWindow: BrowserWindow | null = null;
@@ -14,22 +15,24 @@ const createWindow = (): BrowserWindow => {
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true,
-            preload: path.join(app.getAppPath(), "build/renderer/preload.js"),
-        }
+            preload: path.join(__dirname, "../preload/index.js"),
+        },
     });
     win.setMenuBarVisibility(false);
 
     // Load a remote URL
     win.loadURL("https://genshin.gamedot.org/?mid=genshinmaps").then(() => {
         loadExtension(win);
-        
+
         // loadAutotrack();
     });
 
     // --- Window 이벤트
 
-    // Open the DevTools.
-    win.webContents.openDevTools();
+    if (is.dev) {
+        // Open the DevTools.
+        win.webContents.openDevTools();
+    }
 
     return win;
 };
@@ -77,7 +80,6 @@ async function start() {
     ipcMain.handle("set-config", setConfigHandler);
 
     // --- TODO: App Update
-
 
     // --- Autotrack
     ipcMain.handle("start-track", startTrackHandler);

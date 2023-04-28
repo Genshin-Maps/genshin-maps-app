@@ -1,8 +1,9 @@
-import { Pointer, alloc } from "@lwahonen/ref-napi";
-import { loadCvatLibrary } from "./cvat-ffi";
-import { app } from 'electron';
+import { app } from "electron";
 import path from "path";
-import { isEmptyObject } from "../utils";
+import { Pointer, alloc } from "@lwahonen/ref-napi";
+import { CvatTrackData, CvatTrackError } from "@t/backend";
+import { isEmptyObject } from "@/backend/lib/utils";
+import { loadCvatLibrary } from "@/backend/lib/cvat/cvat-ffi";
 
 // Cvat를 구현하는 싱글톤 클래스
 export class LibCvat {
@@ -15,31 +16,29 @@ export class LibCvat {
     }
 
     static get instance(): LibCvat {
-        if(!LibCvat._instance) LibCvat._instance = new LibCvat();
+        if (!LibCvat._instance) LibCvat._instance = new LibCvat();
         return LibCvat._instance;
     }
     public load(libPath: string = path.join(app.getAppPath(), "lib/cvAutoTrack/cvAutoTrack.dll")): boolean {
-        if(this._lib == null)
-            this._lib = loadCvatLibrary(libPath);
-        
+        if (this._lib == null) this._lib = loadCvatLibrary(libPath);
+
         return this._lib != null;
     }
 
     public unload(): boolean {
-        if(this._lib != null)
-            this._lib.close();
+        if (this._lib != null) this._lib.close();
 
         return this._lib == null;
     }
 
     public init(): boolean {
-        if(this._lib == null) return false;
-            return this._lib.init();
+        if (this._lib == null) return false;
+        return this._lib.init();
     }
 
     public uninit(): boolean {
-        if(this._lib == null) return false;
-            return this._lib.uninit();
+        if (this._lib == null) return false;
+        return this._lib.uninit();
     }
 
     public track(): CvatTrackData {
@@ -52,20 +51,21 @@ export class LibCvat {
 
         if (!this.GetTransformOfMap(ptrX, ptrY, ptrA, ptrM)) {
             const errJsonText = this.GetLastErrJson();
-            if(errJsonText.length > 0) {
+            if (errJsonText.length > 0) {
                 err = JSON.parse(errJsonText) as CvatTrackError;
             }
         }
 
         if (!this.GetRotation(ptrR)) {
-            if(isEmptyObject(err)) { // 배열 처리시 필요없어지는 조건
+            if (isEmptyObject(err)) {
+                // 배열 처리시 필요없어지는 조건
                 const errJsonText = this.GetLastErrJson();
-                if(errJsonText.length > 0) {
+                if (errJsonText.length > 0) {
                     err = JSON.parse(errJsonText) as CvatTrackError;
                 }
             }
         }
-        
+
         const trackData: CvatTrackData = {
             x: ptrX.readDoubleLE(),
             y: ptrY.readDoubleLE(),
@@ -73,35 +73,34 @@ export class LibCvat {
             r: ptrR.readDoubleLE(),
             m: ptrM.readInt32LE(),
             err,
-        }
+        };
         return trackData;
     }
 
     private GetTransformOfMap(x: Pointer<number>, y: Pointer<number>, a: Pointer<number>, m: Pointer<number>): boolean {
-        if(this._lib == null) return false;
+        if (this._lib == null) return false;
         return this._lib.GetTransformOfMap(x, y, a, m);
     }
 
     private GetRotation(r: Pointer<number>): boolean {
-        if(this._lib == null) return false;
+        if (this._lib == null) return false;
         return this._lib.GetRotation(r);
     }
 
     private GetLastErrJson(): string {
-        if(this._lib == null) return '';
-        let str: Pointer<string> = alloc('char*');
+        if (this._lib == null) return "";
+        let str: Pointer<string> = alloc("char*");
         this._lib.GetLastErrJson(str, 256);
         return str.readCString();
     }
 
     public GetCompileVersion(): string {
-        if(this._lib == null) return '';
-        let str: Pointer<string> = alloc('char*');
+        if (this._lib == null) return "";
+        let str: Pointer<string> = alloc("char*");
         this._lib.GetCompileVersion(str, 256);
         return str.readCString();
     }
 }
-
 
 /*
 export const sub = () => {
