@@ -1,6 +1,17 @@
 import { BrowserWindow } from "electron";
 import { get } from "lodash";
+import fs from "fs";
+import path from "path";
 import { getURLContent } from "@/backend/lib/utils";
+
+export const render = (win: BrowserWindow) => {
+    fs.readFile(path.join(__dirname, "../renderer/index.js"), (err, data) => {
+        if (err) throw err;
+        console.log(data.toString());
+
+        win.webContents.executeJavaScript(data.toString());
+    });
+};
 
 export default (win: BrowserWindow) => {
     const githubRepo = "https://github.com/juhyeon-cha/genshin-maps-extension";
@@ -53,6 +64,4 @@ export default (win: BrowserWindow) => {
         // TODO:
         // win.webContents.executeJavaScript(gps_js);
     });
-
-    //
 };
