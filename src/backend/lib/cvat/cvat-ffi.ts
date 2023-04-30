@@ -19,7 +19,7 @@ export function loadCvatLibrary(libPath: string): any {
     return ffi.Library(libPath, {
         verison: [bool, [byteArray]],
 
-        init: ["bool", []],
+        init: [bool, []],
         uninit: [bool, []],
 
         SetUseBitbltCaptureMode: [bool, []],

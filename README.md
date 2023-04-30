@@ -57,3 +57,28 @@ root
         │
         └───unnamed # 지하맵과 맵스 확장 기능을 위한 로직
 ```
+
+## 참고 사항
+
+### 오류
+
+#### No native build was found
+
+> lwahonen/ffi-napi는 환경에 따라 빌드하여 사용하는 라이브러리여서, Electron의 Node.js 버전에 맞춰 빌드할 필요가 있다.
+
+pnpm rebuild로 빌드를 다시 시도할 수 있다.
+
+빌드 명령어와 실행 성공 결과 예시
+
+```cmd
+pnpm rb
+```
+
+```text
+node_modules/.pnpm/es5-ext@0.10.62/node_modules/es5-ext: Running postinstall script, done in 90ms
+. postinstall$ electron-builder install-app-deps
+│ • electron-builder version=23.6.0
+│ • loaded configuration file=D:\Environment\workspace\genshin-maps-app\electron-builder.yml
+│ • rebuilding native dependencies dependencies=@lwahonen/ffi-napi@4.0.12, @lwahonen/ref-napi@4.0.8 platform=win32 arch=x64
+└─ Done in 12.9s
+```

@@ -5,8 +5,11 @@ import path from "path";
 export default defineConfig({
     main: {
         build: {
-            lib: {
-                entry: "./src/backend/index.ts",
+            rollupOptions: {
+                input: {
+                    index: path.resolve(__dirname, "./src/backend/index.ts"),
+                    trackWorker: path.resolve(__dirname, "./src/backend/lib/cvat/worker/trackWorker.ts"),
+                },
             },
         },
         resolve: {
@@ -19,8 +22,10 @@ export default defineConfig({
     },
     preload: {
         build: {
-            lib: {
-                entry: "./src/preload/index.ts",
+            rollupOptions: {
+                input: {
+                    index: path.resolve(__dirname, "./src/preload/index.ts"),
+                },
             },
         },
         resolve: {
@@ -35,7 +40,7 @@ export default defineConfig({
         build: {
             rollupOptions: {
                 input: {
-                    index: "./src/renderer/index.ts",
+                    index: path.resolve(__dirname, "./src/renderer/index.ts"),
                 },
                 output: {
                     entryFileNames: "[name].js",
