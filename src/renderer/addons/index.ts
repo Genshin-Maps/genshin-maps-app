@@ -1,8 +1,8 @@
 import App from "@/renderer/addons/App.svelte";
 
-const app = new App({
+const addons = new App({
     target: document.body,
     props: {},
 });
 
-export default app;
+export default addons;

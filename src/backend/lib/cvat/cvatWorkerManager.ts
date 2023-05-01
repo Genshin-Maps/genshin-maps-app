@@ -1,7 +1,7 @@
 import { Worker } from "worker_threads";
 import { app } from "electron";
 import path from "path";
-import { WorkerEvent } from "@t/backend";
+import { type WorkerEvent } from "@t/backend";
 import { getConfig } from "@/backend/config";
 
 export class CvatWorkerManager {

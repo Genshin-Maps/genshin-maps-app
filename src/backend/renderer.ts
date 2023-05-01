@@ -1,5 +1,4 @@
 import { BrowserWindow } from "electron";
-import { get } from "lodash";
 import fs from "fs";
 import path from "path";
 import { getURLContent } from "@/backend/lib/utils";
@@ -7,44 +6,15 @@ import { getURLContent } from "@/backend/lib/utils";
 export const render = (win: BrowserWindow) => {
     fs.readFile(path.join(__dirname, "../renderer/index.js"), (err, data) => {
         if (err) throw err;
-        console.log(data.toString());
-
         win.webContents.executeJavaScript(data.toString());
     });
 };
 
 export default (win: BrowserWindow) => {
-    const githubRepo = "https://github.com/juhyeon-cha/genshin-maps-extension";
-
-    Promise.all([
-        getURLContent(`${githubRepo}/raw/main/css/select-box.css`),
-        getURLContent(`${githubRepo}/raw/main/css/extension.css`),
-        getURLContent(`${githubRepo}/raw/main/js/select-box.js`),
-        getURLContent(`${githubRepo}/raw/main/extension.js`),
-        getURLContent(`${githubRepo}/raw/main/extension.js`),
-        getURLContent(`https://github.com/Haytsir/Genshin-Paisitioning-Script/raw/gh-pages/userscript/genshin-paisitioning-script.user.js`),
-    ]).then((results) => {
-        const selectbox_css = get(results[0], "data", "");
-        const extension_css = get(results[1], "data", "");
-        const selectbox_js = get(results[2], "data", "");
-        const extension_js = get(results[3], "data", "");
-        // const gps_js = get(results[4], "data", "");
+    Promise.all([getURLContent(`https://github.com/Haytsir/Genshin-Paisitioning-Script/raw/gh-pages/userscript/genshin-paisitioning-script.user.js`)]).then((_) => {
+        // const gps_js = get(results[0], "data", "");
 
         const globalJS = `
-        function GM_getResourceText(resource_name) {
-            if (resource_name == 'selectbox_css') {
-                return \`${selectbox_css}\`;
-            }
-            else if (resource_name == 'extension_css') {
-                return \`${extension_css}\`;
-            }
-        }
-        function GM_addStyle(style_text) {
-            const style = document.createElement('style');
-            style.innerHTML = style_text;
-
-            document.head.appendChild(style);
-        }
         function GM_getValue() {
             // TODO: 
         }
@@ -59,8 +29,6 @@ export default (win: BrowserWindow) => {
         // window.bridge.startTrack();
         `;
         win.webContents.executeJavaScript(globalJS);
-        win.webContents.executeJavaScript(selectbox_js);
-        win.webContents.executeJavaScript(extension_js);
         // TODO:
         // win.webContents.executeJavaScript(gps_js);
     });

@@ -1,5 +1,5 @@
 import { workerData, parentPort } from "worker_threads";
-import { AppConfig } from "@t/backend";
+import { type AppConfig } from "@t/backend";
 import { LibCvat } from "@/backend/lib/cvat";
 
 const config = workerData.config as AppConfig;

@@ -1,5 +1,5 @@
 import { IpcMainInvokeEvent, app } from "electron";
-import { AppConfig, AppInfo } from "@t/backend";
+import { type AppConfig, type AppInfo } from "@t/backend";
 import { mainWindow } from "@/backend";
 import { getConfig, setConfig } from "@/backend/config";
 import { LibCvat } from "@/backend/lib/cvat";

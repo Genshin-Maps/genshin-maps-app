@@ -108,6 +108,9 @@ devDependencies:
   vite:
     specifier: ^4.3.3
     version: 4.3.3(@types/node@18.16.3)
+  vite-plugin-css-injected-by-js:
+    specifier: ^3.1.0
+    version: 3.1.0(vite@4.3.3)
 
 packages:
 
@@ -747,7 +750,6 @@ packages:
       node-gyp-build: 4.6.0
       ref-struct-di: 1.1.1
     transitivePeerDependencies:
-      - bluebird
       - supports-color
     dev: false
 
@@ -762,7 +764,6 @@ packages:
       node-gyp: 8.4.1
       node-gyp-build: 4.6.0
     transitivePeerDependencies:
-      - bluebird
       - supports-color
     dev: false
 
@@ -4283,6 +4284,14 @@ packages:
       extsprintf: 1.4.1
     dev: true
     optional: true
+
+  /vite-plugin-css-injected-by-js@3.1.0(vite@4.3.3):
+    resolution: {integrity: sha512-qogCmpocZfcbSAYZQjS88ieIY0PzLUm7RkLFWFgAxkXdz3N6roZbSTNTxeIOj5IxFbZWACUPuVBBoo6qCuXDcw==}
+    peerDependencies:
+      vite: '>2.0.0-0'
+    dependencies:
+      vite: 4.3.3(@types/node@18.16.3)
+    dev: true
 
   /vite@4.3.3(@types/node@18.16.3):
     resolution: {integrity: sha512-MwFlLBO4udZXd+VBcezo3u8mC77YQk+ik+fbc0GZWGgzfbPP+8Kf0fldhARqvSYmtIWoAJ5BXPClUbMTlqFxrA==}

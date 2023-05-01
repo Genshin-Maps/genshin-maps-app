@@ -1,5 +1,5 @@
 // import "vite/modulepreload-polyfill";
-import app from "@/renderer/addons";
+import addons from "@/renderer/addons";
 // import "@/renderer/auto-track";
 
-export { app };
+export { addons };

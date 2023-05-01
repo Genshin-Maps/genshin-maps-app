@@ -1,5 +1,6 @@
 import { defineConfig, externalizeDepsPlugin } from "electron-vite";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
+import cssInjectedByJsPlugin from "vite-plugin-css-injected-by-js";
 import path from "path";
 
 export default defineConfig({
@@ -44,6 +45,7 @@ export default defineConfig({
                 },
                 output: {
                     entryFileNames: "[name].js",
+                    manualChunks: undefined,
                 },
             },
         },
@@ -53,6 +55,6 @@ export default defineConfig({
                 { find: "@t", replacement: path.resolve(__dirname, "./@types") },
             ],
         },
-        plugins: [svelte(), externalizeDepsPlugin()],
+        plugins: [svelte(), externalizeDepsPlugin(), cssInjectedByJsPlugin()],
     },
 });

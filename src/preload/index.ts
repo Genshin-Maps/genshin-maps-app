@@ -1,6 +1,6 @@
 import { IpcRendererEvent, contextBridge, ipcRenderer } from "electron";
 import { electronAPI } from "@electron-toolkit/preload";
-import { AppConfig, CvatTrackData } from "@t/backend";
+import { type AppConfig, type CvatTrackData } from "@t/backend";
 
 // 프런트엔드에서 사용할 수 있는 API를 노출시킨다.
 // preload.js에서는 context가 renderer process이므로, backend에서 사용할 수 있는 전역 값 등을 사용할 수 없다.
