@@ -3,7 +3,6 @@
     "include": ["electron.vite.config.*", "src/backend/**/*", "src/preload/**/*", "@types/**/*.d.ts"],
     "compilerOptions": {
         "composite": true,
-        "types": ["electron-vite/node"],
         "paths": {
             "@/*": ["./src/*"],
             "@t/*": ["./@types/*"]

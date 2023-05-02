@@ -26,12 +26,13 @@ export function setConfigHandler(_event: IpcMainInvokeEvent, config: AppConfig):
 
 export function startTrackHandler(): void {
     const libManager = CvatWorkerManager.instance;
-    libManager.init();
+    libManager.init({
+        onTrackData: (data) => {
+            console.log("on track data");
+            if (mainWindow) mainWindow.webContents.send("track", data);
+        },
+    });
     libManager.startTrack();
-    libManager.onTrackData = (data) => {
-        console.log("on track data");
-        if (mainWindow) mainWindow.webContents.send("track", data);
-    };
 }
 
 export function stopTrackHandler(): void {

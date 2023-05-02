@@ -9,11 +9,11 @@
 
     const unsubscribe = isUndergroundMapActive.subscribe(value => {
         active = value;
+        globalThis.setPinObjectRefresh();
     });
 
     function handleClick() {
         isUndergroundMapActive.update(active => !active);
-        globalThis.setPinObjectRefresh();
     }
 
     function redraw () {

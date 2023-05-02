@@ -1,14 +1,12 @@
-import { Worker } from "worker_threads";
+import { Worker } from "node:worker_threads";
 import { app } from "electron";
 import path from "path";
-import { type WorkerEvent } from "@t/backend";
+import { type WorkerManagerConfig, type WorkerEvent } from "@t/backend";
 import { getConfig } from "@/backend/config";
 
 export class CvatWorkerManager {
     private static _instance: CvatWorkerManager;
     private _worker: Worker | null = null;
-
-    public onTrackData: (data: any) => void = (_) => {};
 
     static get instance(): CvatWorkerManager {
         if (!CvatWorkerManager._instance) CvatWorkerManager._instance = new CvatWorkerManager();
@@ -17,10 +15,11 @@ export class CvatWorkerManager {
 
     private constructor() {
         this._worker = null;
+        this.onTrackData = () => {};
     }
 
-    public init(): boolean {
-        this._worker = new Worker("./trackWorker.js", {
+    public init(config: WorkerManagerConfig): boolean {
+        this._worker = new Worker("./trackWorker.cjs", {
             workerData: {
                 libPath: path.join(app.getAppPath(), "lib/cvAutoTrack/cvAutoTrack.dll"),
                 config: getConfig(),
@@ -29,6 +28,10 @@ export class CvatWorkerManager {
         this._worker.on("message", (msg) => this.onMessage(msg));
         this._worker.on("error", (err) => this.onError(err));
         this._worker.on("exit", (code) => this.onExit(code));
+        if (config.onTrackData) {
+            this.onTrackData = config.onTrackData;
+        }
+
         return this._worker != null;
     }
 
@@ -45,6 +48,8 @@ export class CvatWorkerManager {
     public stopTrack(): void {
         if (this._worker != null) this._worker.postMessage("stopTrack");
     }
+
+    private onTrackData: (data: any) => void;
 
     private onMessage(msg: WorkerEvent): void {
         if (msg.event === "track") {
