@@ -20,11 +20,11 @@
   "author": "juhyeon-cha",
   "license": "MIT",
   "dependencies": {
+    "@lwahonen/ffi-napi": "^4.0.12",
+    "@lwahonen/ref-napi": "^4.0.8",
     "axios": "^1.4.0",
     "lodash": "^4.17.21",
-    "ref-array-di": "^1.2.2",
-    "@lwahonen/ffi-napi": "^4.0.12",
-    "@lwahonen/ref-napi": "^4.0.8"
+    "ref-array-di": "^1.2.2"
   },
   "devDependencies": {
     "@electron-toolkit/preload": "^1.0.3",
@@ -56,6 +56,7 @@
     "svelte-preprocess": "^5.0.3",
     "tslib": "^2.5.0",
     "typescript": "^5.0.4",
-    "vite": "^4.3.3"
+    "vite": "^4.3.3",
+    "vite-plugin-css-injected-by-js": "^3.1.0"
   }
 }

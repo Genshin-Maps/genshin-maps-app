@@ -1,4 +1,4 @@
-import { AppConfig } from "@t/backend";
+import { type AppConfig } from "@t/backend";
 
 const config: AppConfig = {
     autoAppUpdate: true,

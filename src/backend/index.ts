@@ -1,7 +1,7 @@
 import { app, BrowserWindow, ipcMain, nativeTheme } from "electron";
 import { is } from "@electron-toolkit/utils";
-import path from "path";
-import { default as loadExtension } from "@/backend/load-extension";
+import path from "node:path";
+import { render } from "@/backend/renderer";
 import { getAppInfoHandler, getConfigHandler, setConfigHandler, startTrackHandler, stopTrackHandler } from "@/backend/handlers";
 
 // ---
@@ -22,9 +22,7 @@ const createWindow = (): BrowserWindow => {
 
     // Load a remote URL
     win.loadURL("https://genshin.gamedot.org/?mid=genshinmaps").then(() => {
-        loadExtension(win);
-
-        // loadAutotrack();
+        render(win);
     });
 
     // --- Window 이벤트
