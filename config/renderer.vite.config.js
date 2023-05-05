@@ -1,6 +1,7 @@
 import path from "node:path";
 import { defineConfig } from "vite";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
+import sveltePreprocess from "svelte-preprocess";
 import cssInjectedByJsPlugin from "vite-plugin-css-injected-by-js";
 
 export default defineConfig({
@@ -28,5 +29,7 @@ export default defineConfig({
             { find: "@t", replacement: path.resolve(__dirname, "../@types") },
         ],
     },
-    plugins: [svelte(), cssInjectedByJsPlugin()],
+    plugins: [svelte({
+        preprocess: sveltePreprocess(),
+    }), cssInjectedByJsPlugin()],
 });

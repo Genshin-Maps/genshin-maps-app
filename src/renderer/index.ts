@@ -1,4 +1,4 @@
 import addons from "@/renderer/addons";
-// import "@/renderer/auto-track";
+import autoTrack from "@/renderer/auto-track";
 
-export { addons };
+export { addons, autoTrack };

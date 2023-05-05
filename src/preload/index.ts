@@ -1,20 +1,20 @@
-import { IpcRendererEvent, contextBridge, ipcRenderer } from "electron";
+import { contextBridge, ipcRenderer } from "electron";
 import { electronAPI } from "@electron-toolkit/preload";
-import { type AppConfig, type CvatTrackData } from "@t/backend";
+import type { Bridge } from "@t/renderer";
 
 // 프런트엔드에서 사용할 수 있는 API를 노출시킨다.
 // preload.js에서는 context가 renderer process이므로, backend에서 사용할 수 있는 전역 값 등을 사용할 수 없다.
 // win.{apiKey}.{apiFunction}((event, value) => {}) 형태로 사용할 수 있다.
-const bridge = {
+const bridge: Bridge = {
     getAppInfo: () => ipcRenderer.invoke("get-app-info"),
     getConfig: () => ipcRenderer.invoke("get-config"),
-    setConfig: (config: AppConfig) => ipcRenderer.invoke("set-config", config),
+    setConfig: (config) => ipcRenderer.invoke("set-config", config),
 
-    onUpdate: (callback: (event: IpcRendererEvent, args: any) => {}) => ipcRenderer.on("on-update", callback),
+    onUpdate: (callback) => ipcRenderer.on("on-update", callback),
 
     startTrack: () => ipcRenderer.invoke("start-track"),
     stopTrack: () => ipcRenderer.invoke("stop-track"),
-    onTrack: (callback: (event: IpcRendererEvent, args: CvatTrackData) => {}) => ipcRenderer.on("track", callback),
+    onTrack: (callback) => ipcRenderer.on("track", callback),
 };
 if (process.contextIsolated) {
     try {

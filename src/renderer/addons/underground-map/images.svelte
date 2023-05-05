@@ -1,21 +1,21 @@
 <script lang="ts">
     import { isUndergroundMapActive } from "@/renderer/addons/stores";
-    // import { type BackgroundImage } from "@t/renderer";
+    import type { BackgroundImage } from "@t/renderer";
     import { onDestroy } from "svelte";
     import { images } from "@/renderer/addons/assets/img/images";
 
     let active: boolean = false;
     let layerScale = globalThis.MAPS_ViewSize / globalThis.MAPS_Size;
 
-    function getImageX(image: any) {
+    function getImageX(image: BackgroundImage) {
         return image.offset[0] + globalThis.MAPS_RelativeX;
     }
 
-    function getImageY(image: any) {
+    function getImageY(image: BackgroundImage) {
         return image.offset[1] + globalThis.MAPS_RelativeY;
     }
 
-    function getImageUrl(image: any) {
+    function getImageUrl(image: BackgroundImage) {
         return `https://github.com/juhyeon-cha/genshin-maps-extension/raw/main/${image.url}`;
     }
 

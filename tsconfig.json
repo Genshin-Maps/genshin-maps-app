@@ -1,5 +1,5 @@
 {
-    "extends": "@electron-toolkit/tsconfig/tsconfig.json",
+    "extends": "@tsconfig/svelte/tsconfig.json",
     "include": ["src/renderer/**/*.ts", "src/renderer/**/*.svelte", "@types/**/*.d.ts"],
     "compilerOptions": {
         "verbatimModuleSyntax": true,
