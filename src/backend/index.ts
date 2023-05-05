@@ -3,6 +3,15 @@ import path from "node:path";
 import { render } from "@/backend/renderer";
 import { getAppInfoHandler, getConfigHandler, setConfigHandler, startTrackHandler, stopTrackHandler } from "@/backend/handlers";
 
+// --- Deep link
+if (process.defaultApp) {
+    if (process.argv.length >= 2) {
+        app.setAsDefaultProtocolClient("genshin-maps-app", process.execPath, [path.resolve(process.argv[1])]);
+    }
+} else {
+    app.setAsDefaultProtocolClient("genshin-maps-app");
+}
+
 // ---
 export let mainWindow: BrowserWindow | null = null;
 const createWindow = (): BrowserWindow => {
@@ -42,6 +51,25 @@ const createWindow = (): BrowserWindow => {
 };
 
 function start() {
+    const gotTheLock = app.requestSingleInstanceLock();
+    if (!gotTheLock) {
+        app.quit();
+        return;
+    }
+
+    app.on("second-instance", (_event, commandLine, _workingDirectory) => {
+        // Someone tried to run a second instance, we should focus our window.
+        if (mainWindow) {
+            if (mainWindow.isMinimized()) mainWindow.restore();
+            mainWindow.focus();
+        }
+        const cmd = ((commandLine || []).pop() || "").slice(0, -1);
+        dialog.showErrorBox("Welcome Back", `You arrived from: ${cmd}`);
+    });
+
+    app.on("open-url", (_event, url) => {
+        dialog.showErrorBox("Welcome Back", `You arrived from: ${url}`);
+    });
     // --- App 세팅
     app.whenReady()
         .then(() => {
