@@ -1,6 +1,6 @@
 <script lang="ts">
     import { isPinned } from "@/renderer/auto-track/stores";
-    import { type CvatTrackData } from "@t/backend";
+    // import { type CvatTrackData } from "@t/backend";
     import { type IpcRendererEvent } from "electron";
     import { onDestroy, onMount } from "svelte";
 
@@ -17,7 +17,7 @@
         }
     });
 
-    function onTrack(_event: IpcRendererEvent, data: CvatTrackData) {
+    function onTrack(_event: IpcRendererEvent, data: any) {
         // TODO: 작업 중
         let { m, x, y, r: rot, a: dir } = data; // err
         if (this.currentMap !== m) {
