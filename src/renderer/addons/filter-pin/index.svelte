@@ -7,11 +7,11 @@
 
     const unsubscribe = isFilterPinActive.subscribe(value => {
         active = value;
+        globalThis.setPinObjectRefresh();
     });
 
     function handleClick() {
         isFilterPinActive.update(active => !active);
-        globalThis.setPinObjectRefresh();
     }
 
     export const removeUnnecessary = () => {

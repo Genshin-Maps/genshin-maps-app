@@ -47,18 +47,13 @@ class VanillaSelectBox {
     options: any;
     listElements: any;
     isDisabled: boolean;
-    search: boolean;
-    searchZone: any;
     inputBox: any;
     disabledItems: any[];
     ul: any;
     ulmaxWidth: number;
     maxOptionWidth: number;
     maxSelect: number;
-    isInitRemote: boolean;
-    isSearchRemote: boolean;
     onInit: Function;
-    onSearch: Function;
     onInitSize: number;
     forbidenAttributes: string[];
     forbidenClasses: string[];
@@ -67,7 +62,6 @@ class VanillaSelectBox {
         minWidth: number;
         maxHeight: number;
         translations: { all: string; item: string; items: string; selectAll: string; clearAll: string };
-        search: boolean;
         placeHolder: string;
         stayOpen: boolean;
         disableSelectAll: boolean;
@@ -99,18 +93,13 @@ class VanillaSelectBox {
         this.options;
         this.listElements;
         this.isDisabled = false;
-        this.search = false;
-        this.searchZone = null;
         this.inputBox = null;
         this.disabledItems = [];
         this.ul = undefined;
         this.ulmaxWidth = 280;
         this.maxOptionWidth = Infinity;
         this.maxSelect = Infinity;
-        this.isInitRemote = false;
-        this.isSearchRemote = false;
         this.onInit = () => {};
-        this.onSearch = () => {}; // if isRemote is true : a user defined function that loads more options from the back
         this.onInitSize = -1;
         this.forbidenAttributes = ["class", "selected", "disabled", "data-text", "data-value"];
         this.forbidenClasses = ["active", "disabled"];
@@ -119,7 +108,6 @@ class VanillaSelectBox {
             minWidth: -1,
             maxHeight: 400,
             translations: { all: "All", item: "item", items: "items", selectAll: "Select All", clearAll: "Clear All" },
-            search: false,
             placeHolder: "",
             stayOpen: false,
             disableSelectAll: false,
@@ -152,25 +140,6 @@ class VanillaSelectBox {
             if (options.placeHolder != undefined) {
                 this.userOptions.placeHolder = options.placeHolder;
             }
-            if (options.search != undefined) {
-                this.search = options.search;
-            }
-            if (options.remote != undefined && options.remote) {
-                // user defined onInit  function
-                if (options.remote.onInit != undefined && typeof options.remote.onInit === "function") {
-                    this.onInit = options.remote.onInit;
-                    this.isInitRemote = true;
-                }
-                if (options.remote.onInitSize != undefined) {
-                    this.onInitSize = options.remote.onInitSize;
-                    if (this.onInitSize < 3) this.onInitSize = 3;
-                }
-                // user defined remote search function
-                if (options.remote.onSearch != undefined && typeof options.remote.onSearch === "function") {
-                    this.onSearch = options.remote.onSearch;
-                    this.isSearchRemote = true;
-                }
-            }
 
             if (options.stayOpen != undefined) {
                 this.userOptions.stayOpen = options.stayOpen;
@@ -202,12 +171,6 @@ class VanillaSelectBox {
             let self = this;
             if (!self.userOptions.stayOpen) {
                 self.drop.style.visibility = "hidden";
-                if (self.search) {
-                    self.inputBox.value = "";
-                    Array.prototype.slice.call(self.listElements).forEach(function (x) {
-                        x.classList.remove("hide");
-                    });
-                }
             }
         };
 
@@ -243,14 +206,7 @@ class VanillaSelectBox {
 
         this.init = function () {
             let self = this;
-            if (self.isInitRemote) {
-                self.onInit("", self.onInitSize).then(function (data) {
-                    self.buildSelect(data);
-                    self.createTree();
-                });
-            } else {
-                self.createTree();
-            }
+            self.createTree();
         };
 
         this.getResult = function () {
@@ -337,30 +293,6 @@ class VanillaSelectBox {
             let selectedTexts = "";
             let sep = "";
             let nrActives = 0;
-
-            if (this.search) {
-                this.searchZone = document.createElement("div");
-                this.ul.appendChild(this.searchZone);
-                this.searchZone.classList.add("vsb-js-search-zone");
-                this.searchZone.style.zIndex = 2001 - this.instanceOffset;
-                this.inputBox = document.createElement("input");
-                this.searchZone.appendChild(this.inputBox);
-                this.inputBox.setAttribute("type", "text");
-                this.inputBox.setAttribute("id", "search_" + this.rootToken);
-                if (this.maxOptionWidth < Infinity) {
-                    this.searchZone.style.maxWidth = self.maxOptionWidth + 30 + "px";
-                    this.inputBox.style.maxWidth = self.maxOptionWidth + 30 + "px";
-                }
-
-                var para = document.createElement("p");
-                this.ul.appendChild(para);
-                para.style.fontSize = "12px";
-                para.innerHTML = "&nbsp;";
-                this.ul.addEventListener("scroll", function () {
-                    var y = this.scrollTop;
-                    self.searchZone.parentNode.style.top = y + "px";
-                });
-            }
 
             this.options = document.querySelectorAll(this.domSelector + " > option");
             Array.prototype.slice.call(this.options).forEach(function (x) {
@@ -508,67 +440,6 @@ class VanillaSelectBox {
                 self.title.textContent = self.userOptions.placeHolder;
             }
             self.listElements = self.drop.querySelectorAll("li:not(.grouped-option)");
-            if (self.search && self.inputBox) {
-                self.inputBox.addEventListener("keyup", function (e) {
-                    let searchValue = e.target.value.toUpperCase();
-                    let searchValueLength = searchValue.length;
-                    let nrFound = 0;
-                    let nrChecked = 0;
-                    let selectAll = null;
-                    if (self.isSearchRemote) {
-                        if (searchValueLength == 0) {
-                            self.remoteSearchIntegrate(null);
-                        } else if (searchValueLength >= 3) {
-                            self.onSearch(searchValue).then(function (data) {
-                                self.remoteSearchIntegrate(data);
-                            });
-                        }
-                    } else {
-                        if (searchValueLength < 3) {
-                            Array.prototype.slice.call(self.listElements).forEach(function (x) {
-                                if (x.getAttribute("data-value") === "all") {
-                                    selectAll = x;
-                                } else {
-                                    x.classList.remove("hidden-search");
-                                    nrFound++;
-                                    nrChecked += x.classList.contains("active");
-                                }
-                            });
-                        } else {
-                            Array.prototype.slice.call(self.listElements).forEach(function (x) {
-                                if (x.getAttribute("data-value") !== "all") {
-                                    let text = x.getAttribute("data-text").toUpperCase();
-                                    if (text.indexOf(searchValue) === -1 && x.getAttribute("data-value") !== "all") {
-                                        x.classList.add("hidden-search");
-                                    } else {
-                                        nrFound++;
-                                        x.classList.remove("hidden-search");
-                                        nrChecked += x.classList.contains("active");
-                                    }
-                                } else {
-                                    selectAll = x;
-                                }
-                            });
-                        }
-                        if (selectAll) {
-                            if (nrFound === 0) {
-                                selectAll.classList.add("disabled");
-                            } else {
-                                selectAll.classList.remove("disabled");
-                            }
-                            if (nrChecked !== nrFound) {
-                                selectAll.classList.remove("active");
-                                selectAll.innerText = self.userOptions.translations.selectAll;
-                                selectAll.setAttribute("data-selected", "false");
-                            } else {
-                                selectAll.classList.add("active");
-                                selectAll.innerText = self.userOptions.translations.clearAll;
-                                selectAll.setAttribute("data-selected", "true");
-                            }
-                        }
-                    }
-                });
-            }
 
             if (self.userOptions.stayOpen) {
                 self.drop.style.visibility = "visible";
@@ -715,12 +586,6 @@ class VanillaSelectBox {
             function docListener() {
                 document.removeEventListener("click", docListener);
                 self.drop.style.visibility = "hidden";
-                if (self.search && self.inputBox) {
-                    self.inputBox.value = "";
-                    Array.prototype.slice.call(self.listElements).forEach(function (x) {
-                        x.classList.remove("hidden-search");
-                    });
-                }
             }
         };
         this.init();
@@ -843,12 +708,6 @@ class VanillaSelectBox {
         let self = this;
         self.empty();
         self.remoteSearchIntegrateIt(data);
-        if (options && options.onSearch) {
-            if (typeof options.onSearch === "function") {
-                self.onSearch = options.onSearch;
-                self.isSearchRemote = true;
-            }
-        }
         self.listElements = this.drop.querySelectorAll("li:not(.grouped-option)");
     }
     remoteSearchIntegrateIt(data: any) {

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const getURLContent = (url: string) => {
+export const getURLContent = async (url: string) => {
     return axios.get(url);
 };
 

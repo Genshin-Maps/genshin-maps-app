@@ -11,6 +11,10 @@ export type AppInfo = {
     libVersion?: string;
 };
 
+export type WorkerManagerConfig = {
+    onTrackData?: (data: any) => void;
+};
+
 export type WorkerEvent = {
     event: string;
     data: any;

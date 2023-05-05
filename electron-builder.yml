@@ -1,11 +1,11 @@
-appId: com.electron.app
-productName: my-app
+appId: com.genshin.maps.app
+productName: Genshin Maps App
 directories:
     buildResources: build
 files:
     - "!**/.vscode/*"
     - "!src/*"
-    - "!electron.vite.config.{js,ts,mjs,cjs}"
+    - "!config/*.vite.config.{js,ts,mjs,cjs}"
     - "!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}"
     - "!{.env,.env.*,.npmrc,pnpm-lock.yaml}"
     - "!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}"
@@ -13,12 +13,24 @@ asarUnpack:
     - resources/**
 afterSign: build/notarize.js
 win:
-    executableName: my-app
+    executableName: Genshin Maps App
 nsis:
     artifactName: ${name}-${version}-setup.${ext}
     shortcutName: ${productName}
     uninstallDisplayName: ${productName}
     createDesktopShortcut: always
+mac:
+    entitlementsInherit: build/entitlements.mac.plist
+
+dmg:
+    artifactName: ${name}-${version}.${ext}
+linux:
+    target:
+        - AppImage
+        - snap
+        - deb
+    maintainer: electronjs.org
+    category: Utility
 
 appImage:
     artifactName: ${name}-${version}.${ext}
