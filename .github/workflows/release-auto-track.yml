@@ -1,0 +1,80 @@
+name: Build/release Auto Track Userscript
+
+on:
+    push:
+        tags:
+            - auto-track/v*.*.*
+
+jobs:
+    release:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Check out Git repository
+              uses: actions/checkout@v3
+
+            - name: Install Node.js
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 18
+
+            - name: Install pnpm
+              uses: pnpm/action-setup@v2
+              with:
+                  version: latest
+                  run_install: false
+
+            - name: Get pnpm store directory
+              id: pnpm-cache
+              shell: bash
+              run: |
+                  echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+            - uses: actions/cache@v3
+              name: Setup pnpm cache
+              with:
+                  path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+                  key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: |
+                      ${{ runner.os }}-pnpm-store-
+
+            - name: Install dependencies
+              run: pnpm install
+
+            - name: Build project
+              run: pnpm run vite:auto-track
+
+            - name: Upload production-ready build files
+              uses: actions/upload-artifact@v3
+              with:
+                  name: production-files
+                  path: ./dist
+
+            - name: release
+              uses: softprops/action-gh-release@v1
+              with:
+                  draft: true
+                  files: |
+                      dist/*.js
+              env:
+                  GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+
+    deploy:
+        name: Deploy
+        needs: release
+        runs-on: ubuntu-latest
+        if: github.ref == 'refs/heads/main'
+
+        steps:
+            - name: Download artifact
+              uses: actions/download-artifact@v3
+              with:
+                  name: production-files
+                  path: ./dist
+
+            - name: Deploy to GitHub Pages
+              uses: peaceiris/actions-gh-pages@v3
+              with:
+                  github_token: ${{ secrets.GITHUB_TOKEN }}
+                  publish_dir: ./dist
+                  destination_dir: userscript
