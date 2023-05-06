@@ -1,14 +1,19 @@
-name: Build/Release Auto Track
+name: Build/Release Addons
 
 on:
     push:
         tags:
-            - auto-track/v*.*.*
+            - "addons/v*"
+            - "auto-track/v*"
 
 jobs:
     release:
         name: Build And Release
-        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                os: [ubuntu-latest]
+                node-version: [18]
+        runs-on: ${{ matrix.os }}
         permissions:
             contents: write
 
@@ -16,36 +21,38 @@ jobs:
             - name: Check out Git repository
               uses: actions/checkout@v3
 
-            - name: Install Node.js
-              uses: actions/setup-node@v3
-              with:
-                  node-version: 18
-
-            - name: Install pnpm
-              uses: pnpm/action-setup@v2
-              with:
-                  version: latest
-                  run_install: false
-
-            - name: Get pnpm store directory
-              id: pnpm-cache
+            - name: Determine type
+              id: determine_type
               shell: bash
               run: |
-                  echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+                  TAG=${GITHUB_REF#refs/tags/}
+                  if [[ $TAG == addons* ]]; then
+                    echo "::set-output name=type::addons"
+                  elif [[ $TAG == auto-track* ]]; then
+                    echo "::set-output name=type::auto-track"
+                  else
+                    echo "Invalid tag prefix"
+                    exit 1
+                  fi
 
-            - uses: actions/cache@v3
-              name: Setup pnpm cache
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v3
               with:
-                  path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+                  node-version: ${{ matrix.node-version }}
+                  cache: "pnpm"
+
+            - name: Cache PNPM store
+              uses: actions/cache@v3
+              with:
+                  path: ~/.pnpm-store
                   key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-                  restore-keys: |
-                      ${{ runner.os }}-pnpm-store-
+                  restore-keys: ${{ runner.os }}-pnpm-store-
 
             - name: Install dependencies
               run: pnpm install
 
             - name: Build project
-              run: pnpm run vite:auto-track
+              run: pnpm run vite:${{ steps.determine_type.outputs.type }}
 
             - name: Upload dist files
               uses: actions/upload-artifact@v3
