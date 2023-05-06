@@ -7,3 +7,8 @@ declare module "@lwahonen/ref-napi" {
     import * as ref_napi from "ref-napi";
     export = ref_napi;
 }
+
+declare module "@monkey" {
+    export * from "vite-plugin-monkey/dist/client";
+    export declare const unsafeWindow: Window;
+}
