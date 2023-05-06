@@ -6,6 +6,10 @@
     "license": "MIT",
     "type": "module",
     "main": "out/main/index.cjs",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Genshin-Maps/genshin-maps-app"
+    },
     "scripts": {
         "format": "prettier --write .",
         "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix",
@@ -13,16 +17,17 @@
         "svelte-check": "svelte-check --tsconfig ./tsconfig.json",
         "typecheck": "pnpm run typecheck:node && pnpm run svelte-check",
         "start": "pnpm run vite:build && electron .",
-        "dev": "pnpm run vite:build",
+        "vite:build": "pnpm run vite:main && pnpm run vite:preload && pnpm run vite:renderer",
+        "vite:main": "vite build -c ./config/main.vite.config.ts",
+        "vite:preload": "vite build -c ./config/preload.vite.config.ts",
+        "vite:renderer": "vite build -c ./config/renderer.vite.config.ts",
+        "vite:addons": "pnpm run typecheck && cross-env NODE_ENV=production BUILD_TARGET=addons ts-node -P script/tsconfig.json script/userscript-build.ts",
+        "vite:auto-track": "pnpm run typecheck && cross-env NODE_ENV=production BUILD_TARGET=auto-track ts-node -P script/tsconfig.json script/userscript-build.ts",
         "build": "pnpm run typecheck && pnpm run vite:build",
         "postinstall": "electron-builder install-app-deps",
         "build:win": "pnpm run build && electron-builder --win --config",
         "build:mac": "pnpm run build && electron-builder --mac --config",
-        "build:linux": "npm run build && electron-builder --linux --config",
-        "vite:build": "pnpm run vite:main && pnpm run vite:preload && pnpm run vite:renderer",
-        "vite:main": "vite build -c ./config/main.vite.config.js",
-        "vite:preload": "vite build -c ./config/preload.vite.config.js",
-        "vite:renderer": "vite build -c ./config/renderer.vite.config.js"
+        "build:linux": "npm run build && electron-builder --linux --config"
     },
     "dependencies": {
         "@lwahonen/ffi-napi": "^4.0.12",
@@ -36,6 +41,7 @@
         "@electron-toolkit/tsconfig": "^1.0.1",
         "@electron/notarize": "^1.2.3",
         "@electron/rebuild": "^3.2.13",
+        "@rollup/plugin-alias": "^5.0.0",
         "@sveltejs/vite-plugin-svelte": "^2.1.1",
         "@tsconfig/svelte": "^4.0.1",
         "@types/ffi-napi": "^4.0.7",
@@ -61,9 +67,11 @@
         "svelte-check": "^3.2.0",
         "svelte-preprocess": "^5.0.3",
         "svgo": "^3.0.2",
+        "ts-node": "^10.9.1",
         "tslib": "^2.5.0",
         "typescript": "^5.0.4",
         "vite": "^4.3.4",
-        "vite-plugin-css-injected-by-js": "^3.1.0"
+        "vite-plugin-css-injected-by-js": "^3.1.0",
+        "vite-plugin-monkey": "^3.1.4"
     }
 }

@@ -33,9 +33,10 @@ export const svgLoader: (options?: PluginOptions) => Plugin = (options?: PluginO
     };
 };
 
-export const preventSVGEmit = () => {
+export const preventSVGEmit: (options?: PluginOptions) => Plugin = () => {
     return {
-        generateBundle(_opts, bundle) {
+        name: "prevent-svg-emit-plugin",
+        generateBundle(_opts: any, bundle: any) {
             for (const key in bundle) {
                 if (key.endsWith(".svg")) {
                     delete bundle[key];

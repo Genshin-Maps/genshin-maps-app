@@ -1,10 +1,11 @@
 <script lang="ts">
-	import { isFilterPinActive, isUndergroundMapActive, isChestPinLoaded } from "@/renderer/addons/stores";
+    import { isFilterPinActive, isUndergroundMapActive, isChestPinLoaded } from "@/renderer/addons/stores";
     import "@/renderer/addons/assets/select-box.css";
     import "@/renderer/addons/assets/addons.css";
     import { VanillaSelectBox } from "@/renderer/addons/assets/select-box";
-	import { onMount } from "svelte";
-	import { get } from "svelte/store";
+    import { onMount } from "svelte";
+    import { get } from "svelte/store";
+    import { unsafeWindow } from "@monkey";
     import FilterChest from "@/renderer/addons/filter-chest/index.svelte";
     import FilterPin from "@/renderer/addons/filter-pin/index.svelte";
     import UndergroundMap from "@/renderer/addons/underground-map/index.svelte";
@@ -15,7 +16,7 @@
     let undergroundMap: UndergroundMap;
     function init() {
         // 게임닷 맵스 메소드 오버라이드
-        globalThis.drawMapsLayer = (function (originDrawMapsLayer) {
+        unsafeWindow.drawMapsLayer = (function (originDrawMapsLayer) {
             "use strict";
             return (boolPanelHide: boolean) => {
                 originDrawMapsLayer(boolPanelHide);
@@ -23,15 +24,15 @@
                 undergroundMap.redraw();
                 filterPin.removeUnnecessary();
             };
-        })(globalThis.drawMapsLayer);
+        })(unsafeWindow.drawMapsLayer);
 
-        globalThis.removePin = (function (originRemovePin) {
+        unsafeWindow.removePin = (function (originRemovePin) {
             "use strict";
 
             const _proxyLoadedPin = () => {
-                isChestPinLoaded.set(globalThis.MAPS_PinLoad.filter((value: any) => value.name?.includes("보물상자")).length > 0);
-                globalThis.MAPS_PinLoad = makeObservable(globalThis.MAPS_PinLoad);
-                globalThis.MAPS_PinLoad.observe((_: number, value: any) => {
+                isChestPinLoaded.set(unsafeWindow.MAPS_PinLoad.filter((value: any) => value.name?.includes("보물상자")).length > 0);
+                unsafeWindow.MAPS_PinLoad = makeObservable(unsafeWindow.MAPS_PinLoad);
+                unsafeWindow.MAPS_PinLoad.observe((_: number, value: any) => {
                     if (Object.prototype.toString.call(value) == "[object Object]" && value.name?.includes("보물상자")) {
                         isChestPinLoaded.set(true);
                     }
@@ -43,21 +44,21 @@
                 originRemovePin(boolGroup, pinIndex, boolTabUpdate);
                 _proxyLoadedPin();
             };
-        })(globalThis.removePin);
+        })(unsafeWindow.removePin);
     }
 
     function adjustPin() {
-        if (Object.prototype.toString.call(globalThis.MAPS_ViewPin) != "[object Set]" || globalThis.MAPS_ViewPin.size <= 0) return;
+        if (Object.prototype.toString.call(unsafeWindow.MAPS_ViewPin) != "[object Set]" || unsafeWindow.MAPS_ViewPin.size <= 0) return;
 
         const selectedValues = chestFilter.getResult();
         const OBJECT_PIN_LAYER = document.getElementById("mapsLayerPoint");
-        globalThis.MAPS_ViewPin.forEach((v: any) => {
-            const arrDrawPin = globalThis.MAPS_PinDraw.get(v);
+        unsafeWindow.MAPS_ViewPin.forEach((v: any) => {
+            const arrDrawPin = unsafeWindow.MAPS_PinDraw.get(v);
             if (Object.prototype.toString.call(arrDrawPin) != "[object Array]" || arrDrawPin.length <= 0) return true;
 
             let mapPinGroup = new Map();
             arrDrawPin.forEach((point: any) => {
-                const arrPinData = globalThis.MAPS_PinLoad[point.pin];
+                const arrPinData = unsafeWindow.MAPS_PinLoad[point.pin];
                 if (point.category && arrPinData.category[point.category]) {
                     const arrCategory = arrPinData.category[point.category];
                     if (arrPinData.name?.includes("보물상자")) {
@@ -67,7 +68,7 @@
                         }
                     }
                 }
-                if (globalThis.MAPS_State.pinGroup == true) {
+                if (unsafeWindow.MAPS_State.pinGroup == true) {
                     // 핀 그룹화를 위해 평균 구하기.
                     let arrPinGroup = mapPinGroup.get(point.pin);
                     arrPinGroup = arrPinGroup ? arrPinGroup : { x: 0, y: 0, state: 0, length: 0, points: [], point: point };
@@ -83,10 +84,10 @@
                 return true;
             });
 
-            if (globalThis.MAPS_State.pinGroup) {
+            if (unsafeWindow.MAPS_State.pinGroup) {
                 let constants = {
                     isFilterPinActive: get(isFilterPinActive),
-                    isUndergroundMapActive: get(isUndergroundMapActive)
+                    isUndergroundMapActive: get(isUndergroundMapActive),
                 };
                 mapPinGroup.forEach((value) => {
                     const arrData = v.split("/", 2);
@@ -114,7 +115,7 @@
                     let objectPoint: any;
                     if (length > 1) {
                         console.log("redraw");
-                        objectPoint = globalThis.drawPinObject(true, value.point, arrData);
+                        objectPoint = unsafeWindow.drawPinObject(true, value.point, arrData);
                         objectPoint.className = "maps-point group";
 
                         let objectCount = document.createElement("p");
@@ -123,7 +124,7 @@
                         let groupX = x / length;
                         let groupY = y / length;
 
-                        objectPoint.setAttribute("style", "transform: translate(" + (groupX + globalThis.MAPS_RelativeX) + "px, " + (groupY + globalThis.MAPS_RelativeY) + "px);");
+                        objectPoint.setAttribute("style", "transform: translate(" + (groupX + unsafeWindow.MAPS_RelativeX) + "px, " + (groupY + unsafeWindow.MAPS_RelativeY) + "px);");
                         objectPoint.setAttribute("data-state", state == length ? "true" : "false");
                         objectPoint.removeAttribute("data-tip");
                         if (constants.isUndergroundMapActive) {
@@ -137,7 +138,7 @@
                         OBJECT_PIN_LAYER.appendChild(objectPoint);
                     } else {
                         for (const point of value.points) {
-                            objectPoint = globalThis.drawPinObject(false, point, arrData);
+                            objectPoint = unsafeWindow.drawPinObject(false, point, arrData);
                             OBJECT_PIN_LAYER.appendChild(objectPoint);
                         }
                     }
@@ -152,9 +153,6 @@
     });
 </script>
 
-<style>
-</style>
-
 <template>
     <div class="maps-addons">
         <FilterChest bind:chestFilter />
@@ -162,3 +160,6 @@
         <UndergroundMap bind:this={undergroundMap} />
     </div>
 </template>
+
+<style>
+</style>

@@ -1,17 +1,18 @@
 <script lang="ts">
-	import { isChestPinLoaded } from "@/renderer/addons/stores";
-	import { onMount } from "svelte";
+    import { isChestPinLoaded } from "@/renderer/addons/stores";
+    import { onMount } from "svelte";
+    import { unsafeWindow } from "@monkey";
     import { VanillaSelectBox } from "@/renderer/addons/assets/select-box";
 
     let chestFilter: VanillaSelectBox;
     let isPinLoaded = false;
-    isChestPinLoaded.subscribe(loaded => {
+    isChestPinLoaded.subscribe((loaded) => {
         isPinLoaded = loaded;
         chestFilter?.setValue("all");
     });
 
-    function redraw () {
-        globalThis?.setPinObjectRefresh();
+    function redraw() {
+        unsafeWindow.setPinObjectRefresh();
     }
 
     onMount(() => {
@@ -40,11 +41,8 @@
     export { chestFilter };
 </script>
 
-<style>
-</style>
-
 <template>
-    <div class="chest-pin {isPinLoaded ? '': 'hide'}">
+    <div class="chest-pin {isPinLoaded ? '' : 'hide'}">
         <div class="maps-addons-switch-label">상자 필터</div>
         <select id="chest-filter" multiple on:change={redraw}>
             <option value="평범한" style="color: gray;">평범한</option>
@@ -55,3 +53,6 @@
         </select>
     </div>
 </template>
+
+<style>
+</style>

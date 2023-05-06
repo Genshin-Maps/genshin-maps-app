@@ -3,11 +3,12 @@
     // import { type CvatTrackData } from "@t/backend";
     // import { type IpcRendererEvent } from "electron";
     import { onDestroy, onMount } from "svelte";
+    import { unsafeWindow } from "@monkey";
     import { setFocusScroll, setFocusPoint } from "@/renderer/auto-track/marker";
 
-    let markerX = window.MAPS_RelativeX;
-    let markerY = window.MAPS_RelativeY;
-    let markerScale = window.MAPS_PointScale;
+    let markerX = unsafeWindow.MAPS_RelativeX;
+    let markerY = unsafeWindow.MAPS_RelativeY;
+    let markerScale = unsafeWindow.MAPS_PointScale;
 
     let userMarker: HTMLDivElement;
     let userMarkerIcon: HTMLDivElement;
@@ -20,8 +21,8 @@
             pinned = value;
             if (value) {
                 setFocusScroll(markerX, markerY);
-                if (this.mapInfo.get(currentMapValue) !== window.MAPS_Type) {
-                    window.changeMapsType(this.mapInfo.get(currentMapValue));
+                if (this.mapInfo.get(currentMapValue) !== unsafeWindow.MAPS_Type) {
+                    unsafeWindow.changeMapsType(this.mapInfo.get(currentMapValue));
                 }
             }
         }),
@@ -78,8 +79,8 @@
                     pos[1] = (pos[1] - 2285) / 2;
             }
             let rpos = [pos[0], pos[1]];
-            rpos[0] = pos[0] + window.MAPS_RelativeY - 13;
-            rpos[1] = pos[1] + window.MAPS_RelativeX - 8;
+            rpos[0] = pos[0] + unsafeWindow.MAPS_RelativeY - 13;
+            rpos[1] = pos[1] + unsafeWindow.MAPS_RelativeX - 8;
             if (pinned) {
                 let distance = Math.pow(this.focusPos[0] - pos[0], 2) + Math.pow(this.focusPos[1] - pos[1], 2);
                 distance = Math.sqrt(distance);
@@ -101,12 +102,12 @@
     export let isHover = false;
 
     export function onScaleChange() {
-        markerScale = window.MAPS_PointScale;
+        markerScale = unsafeWindow.MAPS_PointScale;
     }
 
     onMount(() => {
-        window.objectLayerPin.appendChild(userMarker);
-        window.bridge.onTrack(onTrack);
+        unsafeWindow.objectLayerPin.appendChild(userMarker);
+        unsafeWindow.bridge.onTrack(onTrack);
     });
 
     onDestroy(() => {

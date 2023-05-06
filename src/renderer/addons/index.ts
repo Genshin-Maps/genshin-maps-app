@@ -1,12 +1,13 @@
 import { isFilterPinActive, isUndergroundMapActive, isChestPinLoaded } from "@/renderer/addons/stores";
 import { get } from "svelte/store";
+import { unsafeWindow } from "@monkey";
 import App from "@/renderer/addons/App.svelte";
 
 const addons = new App({
     target: document.body,
     props: {},
 });
-globalThis.$store = (function () {
+unsafeWindow.$store = (function () {
     function _isFilterPinActive() {
         return get(isFilterPinActive);
     }

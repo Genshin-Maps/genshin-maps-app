@@ -26,18 +26,26 @@ declare global {
         objectLayerPin: HTMLDivElement | null;
         objectTargetFilterBtn: HTMLDivElement | null;
         MAPS_Size: number;
+        MAPS_ViewSize: number;
         MAPS_PointScale: number;
         MAPS_Scale: number;
         MAPS_RelativeX: number;
         MAPS_RelativeY: number;
         MAPS_ViewMobile: boolean;
         MAPS_Type: string;
+        MAPS_State: any;
+        MAPS_ViewPin: any;
+        MAPS_PinLoad: any;
+        MAPS_PinDraw: any;
         drawMapsScale: (...args: any) => void;
         drawMapsLayer: (...args: any) => void;
+        drawPinObject: (...args: any) => void;
+        setPinObjectRefresh: (...args: any) => void;
         changeMapsType: (...args: any) => void;
         removePin: (...args: any) => void;
 
         electron: ElectronAPI;
         bridge: Bridge;
+        $store: any;
     }
 }
