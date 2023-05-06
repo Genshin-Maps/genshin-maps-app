@@ -1,4 +1,4 @@
-name: Build/release Addons Userscript
+name: Build/Release Addons
 
 on:
     push:
@@ -9,6 +9,8 @@ jobs:
     release:
         name: Build And Release
         runs-on: ubuntu-latest
+        permissions:
+            contents: write
 
         steps:
             - name: Check out Git repository
@@ -63,6 +65,8 @@ jobs:
     deploy:
         name: Deploy
         needs: release
+        permissions:
+            contents: write
         runs-on: ubuntu-latest
         if: github.ref == 'refs/heads/main'
 
