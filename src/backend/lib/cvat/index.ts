@@ -1,7 +1,7 @@
 import { app } from "electron";
 import path from "path";
-import { Pointer, alloc } from "@lwahonen/ref-napi";
-import { type CvatTrackData, type CvatTrackError } from "@t/backend";
+import { type Pointer, alloc } from "@lwahonen/ref-napi";
+import type { CvatTrackData, CvatTrackError } from "@t/backend";
 import { isEmptyObject } from "@/backend/lib/utils";
 import { loadCvatLibrary } from "@/backend/lib/cvat/cvat-ffi";
 

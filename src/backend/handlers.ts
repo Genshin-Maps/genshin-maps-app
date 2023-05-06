@@ -1,5 +1,5 @@
-import { IpcMainInvokeEvent, app } from "electron";
-import { type AppConfig, type AppInfo } from "@t/backend";
+import { type IpcMainInvokeEvent, app } from "electron";
+import type { AppConfig, AppInfo } from "@t/backend";
 import { mainWindow } from "@/backend";
 import { getConfig, setConfig } from "@/backend/config";
 import { LibCvat } from "@/backend/lib/cvat";
@@ -28,7 +28,7 @@ export function startTrackHandler(): void {
     const libManager = CvatWorkerManager.instance;
     libManager.init({
         onTrackData: (data) => {
-            console.log("on track data");
+            console.log(`on track data: ${JSON.stringify(data)}`);
             if (mainWindow) mainWindow.webContents.send("track", data);
         },
     });

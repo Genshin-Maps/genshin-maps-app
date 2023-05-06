@@ -1,17 +1,18 @@
 <script lang="ts">
     import { isFilterPinActive, isUndergroundMapActive } from "@/renderer/addons/stores";
-	import { onDestroy } from "svelte";
-	import { get } from "svelte/store";
-	
+    import { onDestroy } from "svelte";
+    import { unsafeWindow } from "@monkey";
+    import { get } from "svelte/store";
+
     let active: boolean;
 
-    const unsubscribe = isFilterPinActive.subscribe(value => {
+    const unsubscribe = isFilterPinActive.subscribe((value) => {
         active = value;
-        globalThis.setPinObjectRefresh();
+        unsafeWindow.setPinObjectRefresh();
     });
 
     function handleClick() {
-        isFilterPinActive.update(active => !active);
+        isFilterPinActive.update((active) => !active);
     }
 
     export const removeUnnecessary = () => {
@@ -23,10 +24,10 @@
     onDestroy(unsubscribe);
 </script>
 
-<style>
-</style>
-
 <template>
     <div class="maps-addons-switch-label">활성맵 핀</div>
-    <button class="maps-addons-switch {active ? 'on' : ''}" on:click={handleClick}></button>
+    <button class="maps-addons-switch {active ? 'on' : ''}" on:click={handleClick} />
 </template>
+
+<style>
+</style>

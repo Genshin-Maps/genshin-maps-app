@@ -704,7 +704,7 @@ class VanillaSelectBox {
             }
         }
     }
-    changeTree(data: any, options: any) {
+    changeTree(data: any, _: any) {
         let self = this;
         self.empty();
         self.remoteSearchIntegrateIt(data);
