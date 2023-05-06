@@ -45,18 +45,18 @@ jobs:
             - name: Build project
               run: pnpm run vite:addons
 
-            - name: Upload production-ready build files
+            - name: Upload dist files
               uses: actions/upload-artifact@v3
               with:
                   name: production-files
-                  path: ./dist
+                  path: ./out/renderer
 
-            - name: release
+            - name: Release
               uses: softprops/action-gh-release@v1
               with:
                   draft: true
                   files: |
-                      dist/*.js
+                      out/renderer/*.js
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -71,11 +71,11 @@ jobs:
               uses: actions/download-artifact@v3
               with:
                   name: production-files
-                  path: ./dist
+                  path: ./out/renderer
 
             - name: Deploy to GitHub Pages
               uses: peaceiris/actions-gh-pages@v3
               with:
                   github_token: ${{ secrets.GITHUB_TOKEN }}
-                  publish_dir: ./dist
+                  publish_dir: ./out/renderer
                   destination_dir: userscript
