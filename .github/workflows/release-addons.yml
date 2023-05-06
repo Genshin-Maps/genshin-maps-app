@@ -57,7 +57,7 @@ jobs:
                   files: |
                       dist/*.js
               env:
-                  GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     deploy:
         name: Deploy
