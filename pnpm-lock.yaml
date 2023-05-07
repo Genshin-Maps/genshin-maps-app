@@ -21,9 +21,6 @@ devDependencies:
   '@electron-toolkit/preload':
     specifier: ^1.0.3
     version: 1.0.3(electron@24.1.3)
-  '@electron-toolkit/tsconfig':
-    specifier: ^1.0.1
-    version: 1.0.1(@types/node@18.16.3)
   '@electron/notarize':
     specifier: ^1.2.3
     version: 1.2.3
@@ -36,9 +33,6 @@ devDependencies:
   '@sveltejs/vite-plugin-svelte':
     specifier: ^2.1.1
     version: 2.1.1(svelte@3.58.0)(vite@4.3.4)
-  '@tsconfig/svelte':
-    specifier: ^4.0.1
-    version: 4.0.1
   '@types/ffi-napi':
     specifier: ^4.0.7
     version: 4.0.7
@@ -72,6 +66,9 @@ devDependencies:
   electron-builder:
     specifier: ^23.6.0
     version: 23.6.0
+  electron-log:
+    specifier: ^4.4.8
+    version: 4.4.8
   electron-updater:
     specifier: ^5.3.0
     version: 5.3.0
@@ -160,14 +157,6 @@ packages:
       electron: '>=13.0.0'
     dependencies:
       electron: 24.1.3
-    dev: true
-
-  /@electron-toolkit/tsconfig@1.0.1(@types/node@18.16.3):
-    resolution: {integrity: sha512-M0Mol3odspvtCuheyujLNAW7bXq7KFNYVMRtpjFa4ZfES4MuklXBC7Nli/omvc+PRKlrklgAGx3l4VakjNo8jg==}
-    peerDependencies:
-      '@types/node': '*'
-    dependencies:
-      '@types/node': 18.16.3
     dev: true
 
   /@electron/asar@3.2.4:
@@ -714,10 +703,6 @@ packages:
 
   /@tsconfig/node16@1.0.3:
     resolution: {integrity: sha512-yOlFc+7UtL/89t2ZhjPvvB/DeAr3r+Dq58IgzsFkOAvVC6NMJXmCGjbptdXdR9qsX7pKcTL+s87FtYREi2dEEQ==}
-    dev: true
-
-  /@tsconfig/svelte@4.0.1:
-    resolution: {integrity: sha512-B+XlGpmuAQzJqDoBATNCvEPqQg0HkO7S8pM14QDI5NsmtymzRexQ1N+nX2H6RTtFbuFgaZD4I8AAi8voGg0GLg==}
     dev: true
 
   /@types/cacheable-request@6.0.3:
@@ -1878,6 +1863,10 @@ packages:
       yargs: 17.7.2
     transitivePeerDependencies:
       - supports-color
+    dev: true
+
+  /electron-log@4.4.8:
+    resolution: {integrity: sha512-QQ4GvrXO+HkgqqEOYbi+DHL7hj5JM+nHi/j+qrN9zeeXVKy8ZABgbu4CnG+BBqDZ2+tbeq9tUC4DZfIWFU5AZA==}
     dev: true
 
   /electron-osx-sign@0.6.0:

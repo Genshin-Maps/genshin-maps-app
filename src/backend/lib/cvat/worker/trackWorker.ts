@@ -6,7 +6,7 @@ const config = workerData.config as AppConfig;
 const Cvat = LibCvat.instance;
 let trackInterval: NodeJS.Timer | null = null;
 
-Cvat.load(workerData.libPath);
+Cvat.load();
 
 parentPort?.on("message", (message: any) => {
     if (message === "exit") {

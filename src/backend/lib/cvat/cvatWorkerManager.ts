@@ -1,6 +1,4 @@
 import { Worker } from "node:worker_threads";
-import { app } from "electron";
-import path from "path";
 import { type WorkerManagerConfig, type WorkerEvent } from "@t/backend";
 import { getConfig } from "@/backend/config";
 
@@ -21,7 +19,6 @@ export class CvatWorkerManager {
     public init(config: WorkerManagerConfig): boolean {
         this._worker = new Worker("./out/main/trackWorker.cjs", {
             workerData: {
-                libPath: path.join(app.getAppPath(), "lib/cvAutoTrack/cvAutoTrack.dll"),
                 config: getConfig(),
             },
         });

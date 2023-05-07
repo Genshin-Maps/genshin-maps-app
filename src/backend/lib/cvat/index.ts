@@ -5,6 +5,15 @@ import type { CvatTrackData, CvatTrackError } from "@t/backend";
 import { isEmptyObject } from "@/backend/lib/utils";
 import { loadCvatLibrary } from "@/backend/lib/cvat/cvat-ffi";
 
+let unpackedPath: string;
+if (app.isPackaged) {
+    const basePath = path.dirname(app.getAppPath());
+    unpackedPath = path.join(basePath, "app.asar.unpacked");
+} else {
+    unpackedPath = app.getAppPath();
+}
+const libPath = path.join(unpackedPath, "lib/cvAutoTrack/cvAutoTrack.dll");
+
 // Cvat를 구현하는 싱글톤 클래스
 export class LibCvat {
     private static _instance: LibCvat;
@@ -19,7 +28,7 @@ export class LibCvat {
         if (!LibCvat._instance) LibCvat._instance = new LibCvat();
         return LibCvat._instance;
     }
-    public load(libPath: string = path.join(app.getAppPath(), "lib/cvAutoTrack/cvAutoTrack.dll")): boolean {
+    public load(): boolean {
         if (this._lib == null) this._lib = loadCvatLibrary(libPath);
 
         return this._lib != null;
