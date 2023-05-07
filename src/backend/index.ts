@@ -1,5 +1,6 @@
-import { app, BrowserWindow, ipcMain, nativeTheme, Menu, MenuItem, dialog } from "electron";
 import path from "node:path";
+import { app, BrowserWindow, ipcMain, Menu, dialog } from "electron";
+import { menu } from "@/backend/menu";
 import { render } from "@/backend/renderer";
 import { getAppInfoHandler, getConfigHandler, setConfigHandler, startTrackHandler, stopTrackHandler } from "@/backend/handlers";
 
@@ -19,14 +20,12 @@ const createWindow = (): BrowserWindow => {
     const win = new BrowserWindow({
         width: 800,
         height: 600,
-        // frame: false,
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true,
             preload: path.join(__dirname, "../preload/index.cjs"),
         },
     });
-    win.setMenuBarVisibility(false);
 
     // Load a remote URL
     win.loadURL("https://genshin.gamedot.org/?mid=genshinmaps")
@@ -75,6 +74,9 @@ function start() {
         .then(() => {
             mainWindow = createWindow();
 
+            // --- 메뉴
+            Menu.setApplicationMenu(menu);
+
             app.on("activate", () => {
                 if (BrowserWindow.getAllWindows().length === 0) {
                     mainWindow = createWindow();
@@ -104,62 +106,12 @@ function start() {
 
     app.setUserTasks([]);
 
-    // --- 단축키
-    const menu = new Menu();
-    menu.append(
-        new MenuItem({
-            label: "Toggle Underground Map",
-            submenu: [
-                {
-                    role: "help",
-                    accelerator: process.platform === "darwin" ? "Cmd+G" : "Alt+G",
-                    click: () => {
-                        if (mainWindow) mainWindow.webContents.executeJavaScript("globalThis.$store.isUndergroundMapActive.toggle();");
-                    },
-                },
-            ],
-        }),
-    );
-    menu.append(
-        new MenuItem({
-            label: "Toggle Filter Pin",
-            submenu: [
-                {
-                    role: "help",
-                    accelerator: process.platform === "darwin" ? "Cmd+A" : "Alt+A",
-                    click: () => {
-                        if (mainWindow) mainWindow.webContents.executeJavaScript("globalThis.$store.isFilterPinActive.toggle();");
-                    },
-                },
-            ],
-        }),
-    );
-
-    Menu.setApplicationMenu(menu);
-
-    // --- 다크 모드
-
-    ipcMain.handle("dark-mode:toggle", () => {
-        if (nativeTheme.shouldUseDarkColors) {
-            nativeTheme.themeSource = "light";
-        } else {
-            nativeTheme.themeSource = "dark";
-        }
-        return nativeTheme.shouldUseDarkColors;
-    });
-
-    ipcMain.handle("dark-mode:system", () => {
-        nativeTheme.themeSource = "system";
-    });
-
     // --- App Info
     ipcMain.handle("get-app-info", getAppInfoHandler);
 
     // --- Config
     ipcMain.handle("get-config", getConfigHandler);
     ipcMain.handle("set-config", setConfigHandler);
-
-    // --- TODO: App Update
 
     // --- Autotrack
     ipcMain.handle("start-track", startTrackHandler);
