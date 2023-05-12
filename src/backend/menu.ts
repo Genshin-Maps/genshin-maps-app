@@ -26,10 +26,11 @@ template.push(
                 role: "help",
                 accelerator: process.platform === "darwin" ? "Cmd+T" : "Alt+T",
                 click: () => {
-                    // TODO: Always on top 기능 개발.
                     alwaysOnTop = !alwaysOnTop;
-                    const visible = !alwaysOnTop;
-                    if (mainWindow) mainWindow.setMenuBarVisibility(visible);
+                    if (mainWindow) {
+                        mainWindow.setAlwaysOnTop(alwaysOnTop, "screen-saver");
+                        mainWindow.setMenuBarVisibility(!alwaysOnTop);
+                    }
                 },
             },
             {
