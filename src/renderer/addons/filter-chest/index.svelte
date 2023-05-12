@@ -31,7 +31,8 @@
         });
         chestFilter.setValue("all");
 
-        for (const li of chestFilter.ul?.childNodes) {
+        for (const node of chestFilter.ul?.childNodes || []) {
+            const li = node as HTMLLIElement;
             if (li.dataset.value !== "all") {
                 li.textContent += " ■";
             }

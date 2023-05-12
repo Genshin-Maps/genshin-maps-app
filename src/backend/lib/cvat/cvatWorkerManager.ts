@@ -1,5 +1,5 @@
 import { Worker } from "node:worker_threads";
-import { type WorkerManagerConfig, type WorkerEvent } from "@t/backend";
+import type { WorkerManagerConfig, WorkerEvent, WorkerEventData } from "@t/backend";
 import { getConfig } from "@/backend/config";
 
 export class CvatWorkerManager {
@@ -13,7 +13,6 @@ export class CvatWorkerManager {
 
     private constructor() {
         this._worker = null;
-        this.onTrackData = () => {};
     }
 
     public init(config: WorkerManagerConfig): boolean {
@@ -46,17 +45,17 @@ export class CvatWorkerManager {
         if (this._worker != null) this._worker.postMessage("stopTrack");
     }
 
-    private onTrackData: (data: any) => void;
+    private onTrackData: ((data: WorkerEventData) => void) | undefined;
 
     private onMessage(msg: WorkerEvent): void {
-        if (msg.event === "track") {
+        if (msg.event === "track" && this.onTrackData) {
             this.onTrackData(msg.data);
         } else {
             console.debug(msg);
         }
     }
 
-    private onError(err: any): void {
+    private onError(err: unknown): void {
         console.error(err);
     }
 

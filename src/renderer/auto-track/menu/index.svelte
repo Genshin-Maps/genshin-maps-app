@@ -33,7 +33,9 @@
         menu.appendChild(root);
     });
 
-    onDestroy(() => {});
+    onDestroy(() => {
+        unsubscribeAll.forEach((unsubscribe) => unsubscribe());
+    });
 </script>
 
 <template>

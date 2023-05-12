@@ -1,7 +1,7 @@
 import { app } from "electron";
 import path from "path";
 import { type Pointer, alloc } from "@lwahonen/ref-napi";
-import type { CvatTrackData, CvatTrackError } from "@t/backend";
+import type { CvatTrackData, CvatTrackError, CvatLibrary } from "@t/backend";
 import { isEmptyObject } from "@/backend/lib/utils";
 import { loadCvatLibrary } from "@/backend/lib/cvat/cvat-ffi";
 
@@ -17,8 +17,8 @@ const libPath = path.join(unpackedPath, "lib/cvAutoTrack/cvAutoTrack.dll");
 // Cvat를 구현하는 싱글톤 클래스
 export class LibCvat {
     private static _instance: LibCvat;
-    private _lib: any | null;
-    public isTracking: boolean = false;
+    private _lib: CvatLibrary | null;
+    public isTracking = false;
 
     private constructor() {
         this._lib = null;
@@ -51,11 +51,11 @@ export class LibCvat {
     }
 
     public track(): CvatTrackData {
-        let ptrX: Pointer<number> = alloc("double*");
-        let ptrY: Pointer<number> = alloc("double*");
-        let ptrA: Pointer<number> = alloc("double*");
-        let ptrR: Pointer<number> = alloc("double*");
-        let ptrM: Pointer<number> = alloc("int*");
+        const ptrX: Pointer<number> = alloc("double*");
+        const ptrY: Pointer<number> = alloc("double*");
+        const ptrA: Pointer<number> = alloc("double*");
+        const ptrR: Pointer<number> = alloc("double*");
+        const ptrM: Pointer<number> = alloc("int*");
         let err: CvatTrackError = new Object(null); // TODO: 배열 처리 여부 결정
 
         if (!this.GetTransformOfMap(ptrX, ptrY, ptrA, ptrM)) {
@@ -98,14 +98,14 @@ export class LibCvat {
 
     private GetLastErrJson(): string {
         if (this._lib == null) return "";
-        let str: Pointer<string> = alloc("char*");
+        const str: Pointer<string> = alloc("char*");
         this._lib.GetLastErrJson(str, 256);
         return str.readCString();
     }
 
     public GetCompileVersion(): string {
         if (this._lib == null) return "";
-        let str: Pointer<string> = alloc("char*");
+        const str: Pointer<string> = alloc("char*");
         this._lib.GetCompileVersion(str, 256);
         return str.readCString();
     }

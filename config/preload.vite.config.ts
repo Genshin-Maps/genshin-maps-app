@@ -7,7 +7,7 @@ export default defineConfig({
     build: {
         outDir: "out/preload",
         target: "node18.14",
-        minify: false,
+        minify: "esbuild",
         rollupOptions: {
             input: {
                 index: path.resolve(__dirname, "../src/preload/index.ts"),

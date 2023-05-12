@@ -12,7 +12,7 @@ class IpcHelper {
     }
 
     invoke(channel: string) {
-        return (...args: any[]) => this.ipcRenderer.invoke(channel, ...args).catch((err) => console.error(err));
+        return (...args: unknown[]) => this.ipcRenderer.invoke(channel, ...args).catch((err) => console.error(err));
     }
 
     on(channel: string) {
@@ -45,13 +45,11 @@ if (process.contextIsolated) {
         console.error(error);
     }
 } else {
-    // @ts-ignore (define in dts)
     window.electron = electronAPI;
-    // @ts-ignore (define in dts)
     window.bridge = bridge;
 }
 
-/* 
+/*
 On Main:
 win.webContents.send("on-update", updateData);
 

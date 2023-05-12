@@ -12,7 +12,7 @@ export default defineConfig({
     build: {
         outDir: "out/renderer",
         target: "chrome112",
-        minify: false,
+        minify: "esbuild",
         assetsInlineLimit: 0,
         modulePreload: { polyfill: false },
         rollupOptions: {

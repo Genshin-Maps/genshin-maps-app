@@ -13,7 +13,7 @@ export async function build(config: UserConfig = {}, buildInfo: BuildInfo) {
     config.plugins = config.plugins || [];
     config.plugins = config.plugins.slice(0, -1);
 
-    let userscript = buildInfo.getUserscriptConfig();
+    const userscript = buildInfo.getUserscriptConfig();
     userscript.version = buildInfo.getVersion();
     config.plugins.push(
         monkey({

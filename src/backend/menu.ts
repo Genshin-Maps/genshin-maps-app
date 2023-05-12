@@ -3,7 +3,7 @@ import { mainWindow } from "@/backend";
 import { checkForUpdates } from "@/backend/updater";
 
 let alwaysOnTop = false;
-let template: (MenuItemConstructorOptions | MenuItem)[] = [];
+const template: (MenuItemConstructorOptions | MenuItem)[] = [];
 template.push(
     {
         label: "File",

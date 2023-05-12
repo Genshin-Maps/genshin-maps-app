@@ -7,7 +7,7 @@ export default defineConfig({
     build: {
         outDir: "out/main",
         target: "node18.14",
-        minify: false,
+        minify: "esbuild",
         rollupOptions: {
             input: {
                 index: path.resolve(__dirname, "../src/backend/index.ts"),

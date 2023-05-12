@@ -8,7 +8,7 @@ let trackInterval: NodeJS.Timer | null = null;
 
 Cvat.load();
 
-parentPort?.on("message", (message: any) => {
+parentPort?.on("message", (message: string) => {
     if (message === "exit") {
         exit();
     } else if (message === "track") {
@@ -21,7 +21,7 @@ parentPort?.on("message", (message: any) => {
 });
 
 function exit() {
-    parentPort?.postMessage("called exit");
+    parentPort?.postMessage("exit");
     stopTrack();
     Cvat.uninit();
     Cvat.unload();
@@ -29,7 +29,7 @@ function exit() {
 }
 
 function track(): void {
-    let trackData = Cvat.track();
+    const trackData = Cvat.track();
     parentPort?.postMessage({
         event: "track",
         data: trackData,

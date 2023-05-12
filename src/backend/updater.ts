@@ -47,7 +47,8 @@ autoUpdater.on("update-downloaded", () => {
 });
 
 // export this to MenuItem click callback
-function checkForUpdates(menuItem: MenuItem, _focusedWindow, _event) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function checkForUpdates(menuItem: MenuItem, _focusedWindow: Electron.BrowserWindow | undefined, _event: Electron.KeyboardEvent) {
     updater = menuItem;
     updater.enabled = false;
     autoUpdater.checkForUpdates();

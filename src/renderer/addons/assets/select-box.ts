@@ -1,26 +1,26 @@
 /*
 Copyright (C) Philippe Meyer 2019-2021
-Distributed under the MIT License 
+Distributed under the MIT License
 
 https://github.com/PhilippeMarcMeyer/vanillaSelectBox
 */
 
-let VSBoxCounter = (function () {
+const VSBoxCounter = (function () {
     let count = 0;
     let instances = [];
     return {
-        set: function (instancePtr) {
+        set(instancePtr: VanillaSelectBox): number {
             instances.push({ offset: ++count, ptr: instancePtr });
             return instances[instances.length - 1].offset;
         },
-        remove: function (instanceNr) {
-            let temp = instances.filter(function (x) {
+        remove(instanceNr: number): void {
+            const temp = instances.filter((x) => {
                 return x.offset != instanceNr;
             });
             instances = temp.splice(0);
         },
-        closeAllButMe: function (instanceNr) {
-            instances.forEach(function (x) {
+        closeAllButMe(instanceNr: number): void {
+            instances.forEach((x) => {
                 if (x.offset != instanceNr) {
                     x.ptr.closeOrder();
                 }
@@ -30,30 +30,24 @@ let VSBoxCounter = (function () {
 })();
 
 class VanillaSelectBox {
-    instanceOffset: any;
-    domSelector: any;
-    root: any;
-    rootToken: any;
-    main: any;
-    button: any;
-    title: any;
-    isMultiple: any;
+    instanceOffset: number;
+    domSelector: string;
+    root: HTMLSelectElement;
+    rootToken: string;
+    main: HTMLDivElement;
+    button: HTMLDivElement | HTMLButtonElement;
+    title: HTMLSpanElement;
+    isMultiple: boolean;
     multipleSize: number;
-    isOptgroups: boolean;
     currentOptgroup: number;
-    drop: any;
-    top: any;
-    left: any;
-    options: any;
-    listElements: any;
+    drop: HTMLDivElement;
+    options: NodeListOf<HTMLOptionElement>;
+    listElements: NodeListOf<Element>;
     isDisabled: boolean;
-    inputBox: any;
-    disabledItems: any[];
-    ul: any;
+    ul: HTMLUListElement | undefined;
     ulmaxWidth: number;
     maxOptionWidth: number;
     maxSelect: number;
-    onInit: Function;
     onInitSize: number;
     forbidenAttributes: string[];
     forbidenClasses: string[];
@@ -70,13 +64,28 @@ class VanillaSelectBox {
     keepInlineStyles: boolean;
     keepInlineCaretStyles: boolean;
     closeOrder: () => void;
-    getCssArray: (selector: any) => string;
+    getCssArray: (selector: string) => string;
     init: () => void;
-    getResult: () => any[];
+    getResult: () => string[];
     createTree: () => void;
-    constructor(domSelector: string, options: any) {
-        let self = this;
-        this.instanceOffset = VSBoxCounter.set(self);
+    constructor(
+        domSelector: string,
+        options: {
+            maxWidth?: number;
+            minWidth?: number;
+            maxHeight?: number;
+            translations?: { all?: string; item?: string; items?: string; selectAll?: string; clearAll?: string };
+            placeHolder?: string;
+            stayOpen?: boolean;
+            disableSelectAll?: boolean;
+            itemsSeparator?: string;
+            maxSelect?: number;
+            maxOptionWidth?: number;
+            keepInlineStyles?: boolean;
+            keepInlineCaretStyles?: boolean;
+        },
+    ) {
+        this.instanceOffset = VSBoxCounter.set(this);
         this.domSelector = domSelector;
         this.root = document.querySelector(domSelector);
         this.rootToken = null;
@@ -85,21 +94,15 @@ class VanillaSelectBox {
         this.title;
         this.isMultiple = this.root.hasAttribute("multiple");
         this.multipleSize = this.isMultiple && this.root.hasAttribute("size") ? parseInt(this.root.getAttribute("size")) : -1;
-        this.isOptgroups = false;
         this.currentOptgroup = 0;
         this.drop;
-        this.top;
-        this.left;
         this.options;
         this.listElements;
         this.isDisabled = false;
-        this.inputBox = null;
-        this.disabledItems = [];
         this.ul = undefined;
         this.ulmaxWidth = 280;
         this.maxOptionWidth = Infinity;
         this.maxSelect = Infinity;
-        this.onInit = () => {};
         this.onInitSize = -1;
         this.forbidenAttributes = ["class", "selected", "disabled", "data-text", "data-value"];
         this.forbidenClasses = ["active", "disabled"];
@@ -129,8 +132,8 @@ class VanillaSelectBox {
                 this.userOptions.maxHeight = options.maxHeight;
             }
             if (options.translations != undefined) {
-                for (var property in options.translations) {
-                    if (options.translations.hasOwnProperty(property)) {
+                for (const property in options.translations) {
+                    if (Object.prototype.hasOwnProperty.call(options.translations, property)) {
                         if (this.userOptions.translations[property]) {
                             this.userOptions.translations[property] = options.translations[property];
                         }
@@ -168,9 +171,8 @@ class VanillaSelectBox {
         }
 
         this.closeOrder = function () {
-            let self = this;
-            if (!self.userOptions.stayOpen) {
-                self.drop.style.visibility = "hidden";
+            if (!this.userOptions.stayOpen) {
+                this.drop.style.visibility = "hidden";
             }
         };
 
@@ -197,7 +199,7 @@ class VanillaSelectBox {
 
             function cssArrayToString(cssList) {
                 let list = "";
-                cssList.forEach(function (x) {
+                cssList.forEach((x) => {
                     list += x.key + ":" + x.value + ";";
                 });
                 return list;
@@ -205,15 +207,13 @@ class VanillaSelectBox {
         };
 
         this.init = function () {
-            let self = this;
-            self.createTree();
+            this.createTree();
         };
 
         this.getResult = function () {
-            let self = this;
-            let result = [];
-            let collection = self.root.querySelectorAll("option");
-            collection.forEach(function (x) {
+            const result = [];
+            const collection = this.root.querySelectorAll("option");
+            collection.forEach((x) => {
                 if (x.selected) {
                     result.push(x.value);
                 }
@@ -221,10 +221,10 @@ class VanillaSelectBox {
             return result;
         };
 
-        this.createTree = function () {
-            this.rootToken = self.domSelector.replace(/[^A-Za-z0-9]+/, "");
+        this.createTree = () => {
+            this.rootToken = this.domSelector.replace(/[^A-Za-z0-9]+/, "");
             this.root.style.display = "none";
-            let already = document.getElementById("btn-group-" + this.rootToken);
+            const already = document.getElementById("btn-group-" + this.rootToken);
             if (already) {
                 already.remove();
             }
@@ -232,17 +232,16 @@ class VanillaSelectBox {
             this.root.parentNode.insertBefore(this.main, this.root.nextSibling);
             this.main.classList.add("vsb-main");
             this.main.setAttribute("id", "btn-group-" + this.rootToken);
-            this.main.style.marginLeft = this.main.style.marginLeft;
-            if (self.userOptions.stayOpen) {
+            if (this.userOptions.stayOpen) {
                 this.main.style.minHeight = this.userOptions.maxHeight + 10 + "px";
             }
 
-            if (self.userOptions.stayOpen) {
+            if (this.userOptions.stayOpen) {
                 this.button = document.createElement("div");
             } else {
                 this.button = document.createElement("button");
                 if (this.keepInlineStyles) {
-                    var cssList = self.getCssArray(".vsb-main button");
+                    const cssList = this.getCssArray(".vsb-main button");
                     this.button.setAttribute("style", cssList);
                 }
             }
@@ -255,7 +254,7 @@ class VanillaSelectBox {
             this.title = document.createElement("span");
             this.button.appendChild(this.title);
             this.title.classList.add("title");
-            let caret = document.createElement("span");
+            const caret = document.createElement("span");
             this.button.appendChild(caret);
 
             caret.classList.add("caret");
@@ -265,7 +264,7 @@ class VanillaSelectBox {
                 caret.style.marginTop = "8px";
             }
 
-            if (self.userOptions.stayOpen) {
+            if (this.userOptions.stayOpen) {
                 caret.style.display = "none";
                 this.title.style.paddingLeft = "20px";
                 this.title.style.fontStyle = "italic";
@@ -275,7 +274,7 @@ class VanillaSelectBox {
             this.drop = document.createElement("div");
             this.main.appendChild(this.drop);
             this.drop.classList.add("vsb-menu");
-            this.drop.style.zIndex = 2000 - this.instanceOffset;
+            this.drop.style.zIndex = String(2000 - this.instanceOffset);
             this.ul = document.createElement("ul");
             this.drop.appendChild(this.ul);
 
@@ -283,10 +282,10 @@ class VanillaSelectBox {
             this.ul.style.maxWidth = this.ulmaxWidth + "px";
             if (this.isMultiple) {
                 this.ul.classList.add("multi");
-                if (!self.userOptions.disableSelectAll) {
-                    let selectAll = document.createElement("option");
+                if (!this.userOptions.disableSelectAll) {
+                    const selectAll = document.createElement("option");
                     selectAll.setAttribute("value", "all");
-                    selectAll.innerText = self.userOptions.translations.selectAll;
+                    selectAll.innerText = this.userOptions.translations.selectAll;
                     this.root.insertBefore(selectAll, this.root.hasChildNodes() ? this.root.childNodes[0] : null);
                 }
             }
@@ -295,56 +294,56 @@ class VanillaSelectBox {
             let nrActives = 0;
 
             this.options = document.querySelectorAll(this.domSelector + " > option");
-            Array.prototype.slice.call(this.options).forEach(function (x) {
-                let text = x.textContent;
-                let value = x.value;
+            Array.from(this.options).forEach((x: HTMLOptionElement) => {
+                const text = x.textContent;
+                const value = x.value;
                 let originalAttrs;
                 if (x.hasAttributes()) {
-                    originalAttrs = Array.prototype.slice.call(x.attributes).filter(function (a) {
-                        return self.forbidenAttributes.indexOf(a.name) === -1;
+                    originalAttrs = Array.from(x.attributes).filter((a) => {
+                        return this.forbidenAttributes.indexOf(a.name) === -1;
                     });
                 }
-                let classes = x.getAttribute("class");
+                let classes: string | string[] = x.getAttribute("class");
                 if (classes) {
-                    classes = classes.split(" ").filter(function (c) {
-                        return self.forbidenClasses.indexOf(c) === -1;
+                    classes = classes.split(" ").filter((c) => {
+                        return this.forbidenClasses.indexOf(c) === -1;
                     });
                 } else {
                     classes = [];
                 }
-                let li = document.createElement("li");
-                let isSelected = x.hasAttribute("selected");
-                let isDisabled = x.hasAttribute("disabled");
+                const li = document.createElement("li");
+                const isSelected = x.hasAttribute("selected");
+                const isDisabled = x.hasAttribute("disabled");
 
-                self.ul.appendChild(li);
+                this.ul.appendChild(li);
                 li.setAttribute("data-value", value);
                 li.setAttribute("data-text", text);
 
                 if (originalAttrs !== undefined) {
-                    originalAttrs.forEach(function (a) {
+                    originalAttrs.forEach((a) => {
                         li.setAttribute(a.name, a.value);
                     });
                 }
 
-                classes.forEach(function (x) {
+                classes.forEach((x) => {
                     li.classList.add(x);
                 });
 
-                if (self.maxOptionWidth < Infinity) {
+                if (this.maxOptionWidth < Infinity) {
                     li.classList.add("short");
-                    li.style.maxWidth = self.maxOptionWidth + "px";
+                    li.style.maxWidth = this.maxOptionWidth + "px";
                 }
 
                 if (isSelected) {
                     nrActives++;
                     selectedTexts += sep + text;
-                    sep = self.userOptions.buttonItemsSeparator;
+                    sep = this.userOptions.buttonItemsSeparator;
                     li.classList.add("active");
-                    if (!self.isMultiple) {
-                        self.title.textContent = text;
+                    if (!this.isMultiple) {
+                        this.title.textContent = text;
                         if (classes.length != 0) {
-                            classes.forEach(function (x) {
-                                self.title.classList.add(x);
+                            classes.forEach((x) => {
+                                this.title.classList.add(x);
                             });
                         }
                     }
@@ -355,126 +354,62 @@ class VanillaSelectBox {
                 li.appendChild(document.createTextNode(" " + text));
             });
 
-            if (document.querySelector(self.domSelector + " optgroup") !== null) {
-                self.isOptgroups = true;
-                self.options = document.querySelectorAll(self.domSelector + " option");
-                let groups = document.querySelectorAll(self.domSelector + " optgroup");
-                Array.prototype.slice.call(groups).forEach(function (group) {
-                    let groupOptions = group.querySelectorAll("option");
-                    let li = document.createElement("li");
-                    let span = document.createElement("span");
-                    let iCheck = document.createElement("i");
-                    let labelElement = document.createElement("b");
-                    let dataWay = group.getAttribute("data-way");
-                    if (!dataWay) dataWay = "closed";
-                    if (!dataWay || (dataWay !== "closed" && dataWay !== "open")) dataWay = "closed";
-                    li.appendChild(span);
-                    li.appendChild(iCheck);
-                    self.ul.appendChild(li);
-                    li.classList.add("grouped-option");
-                    li.classList.add(dataWay);
-                    self.currentOptgroup++;
-                    let optId = self.rootToken + "-opt-" + self.currentOptgroup;
-                    li.id = optId;
-                    li.appendChild(labelElement);
-                    labelElement.appendChild(document.createTextNode(group.label));
-                    li.setAttribute("data-text", group.label);
-                    self.ul.appendChild(li);
-
-                    Array.prototype.slice.call(groupOptions).forEach(function (x) {
-                        let text = x.textContent;
-                        let value = x.value;
-                        let classes = x.getAttribute("class");
-                        if (classes) {
-                            classes = classes.split(" ");
-                        } else {
-                            classes = [];
-                        }
-                        classes.push(dataWay);
-                        let li = document.createElement("li");
-                        let isSelected = x.hasAttribute("selected");
-                        self.ul.appendChild(li);
-                        li.setAttribute("data-value", value);
-                        li.setAttribute("data-text", text);
-                        li.setAttribute("data-parent", optId);
-                        if (classes.length != 0) {
-                            classes.forEach(function (x) {
-                                li.classList.add(x);
-                            });
-                        }
-                        if (isSelected) {
-                            nrActives++;
-                            selectedTexts += sep + text;
-                            sep = self.userOptions.buttonItemsSeparator;
-                            li.classList.add("active");
-                            if (!self.isMultiple) {
-                                self.title.textContent = text;
-                                if (classes.length != 0) {
-                                    classes.forEach(function (x) {
-                                        self.title.classList.add(x);
-                                    });
-                                }
-                            }
-                        }
-                        li.appendChild(document.createTextNode(text));
-                    });
-                });
-            }
-
-            let optionsLength = self.options.length - Number(!self.userOptions.disableSelectAll);
+            const optionsLength = this.options.length - Number(!this.userOptions.disableSelectAll);
 
             if (optionsLength == nrActives) {
                 // Bastoune idea to preserve the placeholder
-                let wordForAll = self.userOptions.translations.all;
+                const wordForAll = this.userOptions.translations.all;
                 selectedTexts = wordForAll;
-            } else if (self.multipleSize != -1) {
-                if (nrActives > self.multipleSize) {
-                    let wordForItems = nrActives === 1 ? self.userOptions.translations.item : self.userOptions.translations.items;
+            } else if (this.multipleSize != -1) {
+                if (nrActives > this.multipleSize) {
+                    const wordForItems = nrActives === 1 ? this.userOptions.translations.item : this.userOptions.translations.items;
                     selectedTexts = nrActives + " " + wordForItems;
                 }
             }
-            if (self.isMultiple) {
-                self.title.innerHTML = selectedTexts;
+            if (this.isMultiple) {
+                this.title.innerHTML = selectedTexts;
             }
-            if (self.userOptions.placeHolder != "" && self.title.textContent == "") {
-                self.title.textContent = self.userOptions.placeHolder;
+            if (this.userOptions.placeHolder != "" && this.title.textContent == "") {
+                this.title.textContent = this.userOptions.placeHolder;
             }
-            self.listElements = self.drop.querySelectorAll("li:not(.grouped-option)");
+            this.listElements = this.drop.querySelectorAll("li:not(.grouped-option)");
 
-            if (self.userOptions.stayOpen) {
-                self.drop.style.visibility = "visible";
-                self.drop.style.boxShadow = "none";
-                self.drop.style.minHeight = this.userOptions.maxHeight + 10 + "px";
-                self.drop.style.position = "relative";
-                self.drop.style.left = "0px";
-                self.drop.style.top = "0px";
-                self.button.style.border = "none";
+            if (this.userOptions.stayOpen) {
+                this.drop.style.visibility = "visible";
+                this.drop.style.boxShadow = "none";
+                this.drop.style.minHeight = this.userOptions.maxHeight + 10 + "px";
+                this.drop.style.position = "relative";
+                this.drop.style.left = "0px";
+                this.drop.style.top = "0px";
+                this.button.style.border = "none";
             } else {
-                this.main.addEventListener("click", function (e) {
-                    if (self.isDisabled) return;
-                    self.drop.style.visibility = "visible";
+                this.main.addEventListener("click", (e) => {
+                    if (this.isDisabled) return;
+                    this.drop.style.visibility = "visible";
                     document.addEventListener("click", docListener);
                     e.preventDefault();
                     e.stopPropagation();
-                    if (!self.userOptions.stayOpen) {
-                        VSBoxCounter.closeAllButMe(self.instanceOffset);
+                    if (!this.userOptions.stayOpen) {
+                        VSBoxCounter.closeAllButMe(this.instanceOffset);
                     }
                 });
             }
 
-            this.drop.addEventListener("click", function (e) {
-                if (self.isDisabled) return;
-                if (e.target.tagName === "INPUT") return;
-                let isShowHideCommand = e.target.tagName === "SPAN";
-                let isCheckCommand = e.target.tagName === "I";
-                let liClicked = e.target.parentElement;
+            this.drop.addEventListener("click", (e) => {
+                if (this.isDisabled) return;
+                const target = e.target as HTMLElement;
+
+                if (target.tagName === "INPUT") return;
+                const isShowHideCommand = target.tagName === "SPAN";
+                const isCheckCommand = target.tagName === "I";
+                const liClicked = target.parentElement;
                 if (!liClicked.hasAttribute("data-value")) {
                     if (liClicked.classList.contains("grouped-option")) {
                         if (!isShowHideCommand && !isCheckCommand) return;
                         let oldClass, newClass;
                         if (isCheckCommand) {
                             // check or uncheck children
-                            self.checkUncheckFromParent(liClicked);
+                            this.checkUncheckFromParent(liClicked);
                         } else {
                             //open or close
                             if (liClicked.classList.contains("open")) {
@@ -486,8 +421,8 @@ class VanillaSelectBox {
                             }
                             liClicked.classList.remove(oldClass);
                             liClicked.classList.add(newClass);
-                            let theChildren = self.drop.querySelectorAll("[data-parent='" + liClicked.id + "']");
-                            theChildren.forEach(function (x) {
+                            const theChildren = this.drop.querySelectorAll("[data-parent='" + liClicked.id + "']");
+                            theChildren.forEach((x) => {
                                 x.classList.remove(oldClass);
                                 x.classList.add(newClass);
                             });
@@ -495,9 +430,9 @@ class VanillaSelectBox {
                         return;
                     }
                 }
-                let choiceValue = e.target.getAttribute("data-value");
-                let choiceText = e.target.getAttribute("data-text");
-                let className = e.target.getAttribute("class");
+                const choiceValue = target.getAttribute("data-value");
+                const choiceText = target.getAttribute("data-text");
+                const className = target.getAttribute("class");
 
                 if (className && className.indexOf("disabled") != -1) {
                     return;
@@ -508,30 +443,30 @@ class VanillaSelectBox {
                 }
 
                 if (choiceValue === "all") {
-                    if (e.target.hasAttribute("data-selected") && e.target.getAttribute("data-selected") === "true") {
-                        self.setValue("none");
+                    if (target.hasAttribute("data-selected") && target.getAttribute("data-selected") === "true") {
+                        this.setValue("none");
                     } else {
-                        self.setValue("all");
+                        this.setValue("all");
                     }
                     return;
                 }
 
-                if (!self.isMultiple) {
-                    self.root.value = choiceValue;
-                    self.title.textContent = choiceText;
+                if (!this.isMultiple) {
+                    this.root.value = choiceValue;
+                    this.title.textContent = choiceText;
                     if (className) {
-                        self.title.setAttribute("class", className + " title");
+                        this.title.setAttribute("class", className + " title");
                     } else {
-                        self.title.setAttribute("class", "title");
+                        this.title.setAttribute("class", "title");
                     }
-                    Array.prototype.slice.call(self.listElements).forEach(function (x) {
+                    Array.from(this.listElements).forEach((x) => {
                         x.classList.remove("active");
                     });
                     if (choiceText != "") {
-                        e.target.classList.add("active");
+                        target.classList.add("active");
                     }
-                    self.privateSendChange();
-                    if (!self.userOptions.stayOpen) {
+                    this.privateSendChange();
+                    if (!this.userOptions.stayOpen) {
                         docListener();
                     }
                 } else {
@@ -540,370 +475,82 @@ class VanillaSelectBox {
                         wasActive = className.indexOf("active") != -1;
                     }
                     if (wasActive) {
-                        e.target.classList.remove("active");
+                        target.classList.remove("active");
                     } else {
-                        e.target.classList.add("active");
+                        target.classList.add("active");
                     }
-                    if (e.target.hasAttribute("data-parent")) {
-                        self.checkUncheckFromChild(e.target);
+                    if (target.hasAttribute("data-parent")) {
+                        this.checkUncheckFromChild(target);
                     }
 
                     let selectedTexts = "";
                     let sep = "";
                     let nrActives = 0;
                     let nrAll = 0;
-                    for (let i = 0; i < self.options.length; i++) {
+                    for (let i = 0; i < this.options.length; i++) {
                         nrAll++;
-                        if (self.options[i].value == choiceValue) {
-                            self.options[i].selected = !wasActive;
+                        if (this.options[i].value == choiceValue) {
+                            this.options[i].selected = !wasActive;
                         }
-                        if (self.options[i].selected) {
+                        if (this.options[i].selected) {
                             nrActives++;
-                            selectedTexts += sep + self.options[i].textContent;
-                            sep = self.userOptions.buttonItemsSeparator;
+                            selectedTexts += sep + this.options[i].textContent;
+                            sep = this.userOptions.buttonItemsSeparator;
                         }
                     }
-                    if (nrAll == nrActives - Number(!self.userOptions.disableSelectAll)) {
-                        let wordForAll = self.userOptions.translations.all;
+                    if (nrAll == nrActives - Number(!this.userOptions.disableSelectAll)) {
+                        const wordForAll = this.userOptions.translations.all;
                         selectedTexts = wordForAll;
-                    } else if (self.multipleSize != -1) {
-                        if (nrActives > self.multipleSize) {
-                            let wordForItems = nrActives === 1 ? self.userOptions.translations.item : self.userOptions.translations.items;
+                    } else if (this.multipleSize != -1) {
+                        if (nrActives > this.multipleSize) {
+                            const wordForItems = nrActives === 1 ? this.userOptions.translations.item : this.userOptions.translations.items;
                             selectedTexts = nrActives + " " + wordForItems;
                         }
                     }
-                    self.title.textContent = selectedTexts;
-                    self.checkSelectMax(nrActives);
-                    self.checkUncheckAll();
-                    self.privateSendChange();
+                    this.title.textContent = selectedTexts;
+                    this.checkSelectMax(nrActives);
+                    this.checkUncheckAll();
+                    this.privateSendChange();
                 }
                 e.preventDefault();
                 e.stopPropagation();
-                if (self.userOptions.placeHolder != "" && self.title.textContent == "") {
-                    self.title.textContent = self.userOptions.placeHolder;
+                if (this.userOptions.placeHolder != "" && this.title.textContent == "") {
+                    this.title.textContent = this.userOptions.placeHolder;
                 }
             });
-            function docListener() {
+            const docListener = () => {
                 document.removeEventListener("click", docListener);
-                self.drop.style.visibility = "hidden";
-            }
+                this.drop.style.visibility = "hidden";
+            };
         };
         this.init();
         this.checkUncheckAll();
     }
-    buildSelect(data) {
-        let self = this;
-        if (data == null || data.length < 1) return;
-        if (!self.isOptgroups) {
-            self.isOptgroups = data[0].parent != undefined && data[0].parent != "";
-        }
-
-        if (self.isOptgroups) {
-            let groups = {};
-            data = data.filter(function (x) {
-                return x.parent != undefined && x.parent != "";
-            });
-
-            data.forEach(function (x) {
-                if (!groups[x.parent]) {
-                    groups[x.parent] = true;
-                }
-            });
-            for (let group in groups) {
-                let anOptgroup = document.createElement("optgroup");
-                anOptgroup.setAttribute("label", group);
-
-                let options = data.filter(function (x) {
-                    return x.parent == group;
-                });
-                options.forEach(function (x) {
-                    let anOption = document.createElement("option");
-                    anOption.value = x.value;
-                    anOption.text = x.text;
-                    if (x.selected) {
-                        anOption.setAttribute("selected", "true");
-                    }
-                    anOptgroup.appendChild(anOption);
-                });
-                self.root.appendChild(anOptgroup);
-            }
-        } else {
-            data.forEach(function (x: any) {
-                let anOption = document.createElement("option");
-                anOption.value = x.value;
-                anOption.text = x.text;
-                if (x.selected) {
-                    anOption.setAttribute("selected", "true");
-                }
-                self.root.appendChild(anOption);
-            });
-        }
-    }
-    remoteSearchIntegrate(data) {
-        let self = this;
-
-        if (data == null || data.length == 0) {
-            let dataChecked = self.optionsCheckedToData();
-            if (dataChecked) data = dataChecked.slice(0);
-            self.remoteSearchIntegrateIt(data);
-        } else {
-            let dataChecked = self.optionsCheckedToData();
-            if (dataChecked.length > 0) {
-                for (var i = data.length - 1; i >= 0; i--) {
-                    if (dataChecked.indexOf(data[i].id) != -1) {
-                        data.slice(i, 1);
-                    }
-                }
-            }
-            data = data.concat(dataChecked);
-
-            self.remoteSearchIntegrateIt(data);
-        }
-    }
-    optionsCheckedToData() {
-        let self = this;
-        let dataChecked = [];
-        let treeOptions = self.ul.querySelectorAll("li.active:not(.grouped-option)");
-        let keepParents = {};
-        if (treeOptions) {
-            Array.prototype.slice.call(treeOptions).forEach(function (x) {
-                let oneData = { value: x.getAttribute("data-value"), text: x.getAttribute("data-text"), selected: true, parent: null };
-                if (oneData.value !== "all") {
-                    if (self.isOptgroups) {
-                        let parentId = x.getAttribute("data-parent");
-                        if (keepParents[parentId] != undefined) {
-                            oneData.parent = keepParents[parentId];
-                        } else {
-                            let parentPtr = self.ul.querySelector("#" + parentId);
-                            let parentName = parentPtr.getAttribute("data-text");
-                            keepParents[parentId] = parentName;
-                            oneData.parent = parentName;
-                        }
-                    }
-                    dataChecked.push(oneData);
-                }
-            });
-        }
-        return dataChecked;
-    }
-    removeOptionsNotChecked(data: any) {
-        let self = this;
-        let minimumSize = self.onInitSize;
-        let newSearchSize = data == null ? 0 : data.length;
-        let presentSize = self.root.length;
-        if (presentSize + newSearchSize > minimumSize) {
-            let maxToRemove = presentSize + newSearchSize - minimumSize - 1;
-            let removed = 0;
-            for (var i = self.root.length - 1; i >= 0; i--) {
-                if (self.root.options[i].selected == false) {
-                    if (removed <= maxToRemove) {
-                        removed++;
-                        self.root.remove(i);
-                    }
-                }
-            }
-        }
-    }
-    changeTree(data: any, _: any) {
-        let self = this;
-        self.empty();
-        self.remoteSearchIntegrateIt(data);
-        self.listElements = this.drop.querySelectorAll("li:not(.grouped-option)");
-    }
-    remoteSearchIntegrateIt(data: any) {
-        let self = this;
-        if (data == null || data.length == 0) return;
-        while (self.root.firstChild) self.root.removeChild(self.root.firstChild);
-
-        self.buildSelect(data);
-        self.reloadTree();
-    }
-    reloadTree() {
-        let self = this;
-        let lis = self.ul.querySelectorAll("li");
-        if (lis != null) {
-            for (var i = lis.length - 1; i >= 0; i--) {
-                if (lis[i].getAttribute("data-value") !== "all") {
-                    self.ul.removeChild(lis[i]);
-                }
-            }
-        }
-
-        if (self.isOptgroups) {
-            if (document.querySelector(self.domSelector + " optgroup") !== null) {
-                self.options = document.querySelectorAll(this.domSelector + " option");
-                let groups = document.querySelectorAll(this.domSelector + " optgroup");
-                Array.prototype.slice.call(groups).forEach(function (group) {
-                    let groupOptions = group.querySelectorAll("option");
-                    let li = document.createElement("li");
-                    let span = document.createElement("span");
-                    let iCheck = document.createElement("i");
-                    let labelElement = document.createElement("b");
-                    let dataWay = group.getAttribute("data-way");
-                    if (!dataWay) dataWay = "closed";
-                    if (!dataWay || (dataWay !== "closed" && dataWay !== "open")) dataWay = "closed";
-                    li.appendChild(span);
-                    li.appendChild(iCheck);
-                    self.ul.appendChild(li);
-                    li.classList.add("grouped-option");
-                    li.classList.add(dataWay);
-                    self.currentOptgroup++;
-                    let optId = self.rootToken + "-opt-" + self.currentOptgroup;
-                    li.id = optId;
-                    li.appendChild(labelElement);
-                    labelElement.appendChild(document.createTextNode(group.label));
-                    li.setAttribute("data-text", group.label);
-                    self.ul.appendChild(li);
-
-                    Array.prototype.slice.call(groupOptions).forEach(function (x) {
-                        let text = x.textContent;
-                        let value = x.value;
-                        let classes = x.getAttribute("class");
-                        if (classes) {
-                            classes = classes.split(" ");
-                        } else {
-                            classes = [];
-                        }
-                        classes.push(dataWay);
-                        let li = document.createElement("li");
-                        let isSelected = x.hasAttribute("selected");
-                        self.ul.appendChild(li);
-                        li.setAttribute("data-value", value);
-                        li.setAttribute("data-text", text);
-                        li.setAttribute("data-parent", optId);
-                        if (classes.length != 0) {
-                            classes.forEach(function (x) {
-                                li.classList.add(x);
-                            });
-                        }
-                        if (isSelected) {
-                            li.classList.add("active");
-                            if (!self.isMultiple) {
-                                self.title.textContent = text;
-                                if (classes.length != 0) {
-                                    classes.forEach(function (x) {
-                                        self.title.classList.add(x);
-                                    });
-                                }
-                            }
-                        }
-                        li.appendChild(document.createTextNode(text));
-                    });
-                });
-            }
-            self.listElements = this.drop.querySelectorAll("li:not(.grouped-option)");
-        } else {
-            self.options = self.root.querySelectorAll("option");
-            Array.prototype.slice.call(self.options).forEach(function (x) {
-                let text = x.textContent;
-                let value = x.value;
-                if (value != "all") {
-                    let originalAttrs;
-                    if (x.hasAttributes()) {
-                        originalAttrs = Array.prototype.slice.call(x.attributes).filter(function (a) {
-                            return self.forbidenAttributes.indexOf(a.name) === -1;
-                        });
-                    }
-                    let classes = x.getAttribute("class");
-                    if (classes) {
-                        classes = classes.split(" ").filter(function (c) {
-                            return self.forbidenClasses.indexOf(c) === -1;
-                        });
-                    } else {
-                        classes = [];
-                    }
-                    let li = document.createElement("li");
-                    let isSelected = x.hasAttribute("selected");
-
-                    let isDisabled = x.disabled;
-
-                    self.ul.appendChild(li);
-                    li.setAttribute("data-value", value);
-                    li.setAttribute("data-text", text);
-
-                    if (originalAttrs !== undefined) {
-                        originalAttrs.forEach(function (a) {
-                            li.setAttribute(a.name, a.value);
-                        });
-                    }
-
-                    classes.forEach(function (x) {
-                        li.classList.add(x);
-                    });
-
-                    if (self.maxOptionWidth < Infinity) {
-                        li.classList.add("short");
-                        li.style.maxWidth = self.maxOptionWidth + "px";
-                    }
-
-                    if (isSelected) {
-                        li.classList.add("active");
-                        if (!self.isMultiple) {
-                            self.title.textContent = text;
-                            if (classes.length != 0) {
-                                classes.forEach(function (x) {
-                                    self.title.classList.add(x);
-                                });
-                            }
-                        }
-                    }
-                    if (isDisabled) {
-                        li.classList.add("disabled");
-                    }
-                    li.appendChild(document.createTextNode(" " + text));
-                }
-            });
-        }
-    }
     disableItems(values) {
-        let self = this;
-        let foundValues = [];
+        const foundValues = [];
         if (vanillaSelectBox_type(values) == "string") {
             values = values.split(",");
         }
 
         if (vanillaSelectBox_type(values) == "array") {
-            Array.prototype.slice.call(self.options).forEach(function (x) {
+            Array.from(this.options).forEach((x) => {
                 if (values.indexOf(x.value) != -1) {
                     foundValues.push(x.value);
                     x.setAttribute("disabled", "");
                 }
             });
         }
-        Array.prototype.slice.call(self.listElements).forEach(function (x) {
-            let val = x.getAttribute("data-value");
+        Array.from(this.listElements).forEach((x) => {
+            const val = x.getAttribute("data-value");
             if (foundValues.indexOf(val) != -1) {
                 x.classList.add("disabled");
             }
         });
     }
-    enableItems(values) {
-        let self = this;
-        let foundValues = [];
-        if (vanillaSelectBox_type(values) == "string") {
-            values = values.split(",");
-        }
-
-        if (vanillaSelectBox_type(values) == "array") {
-            Array.prototype.slice.call(self.options).forEach(function (x) {
-                if (values.indexOf(x.value) != -1) {
-                    foundValues.push(x.value);
-                    x.removeAttribute("disabled");
-                }
-            });
-        }
-
-        Array.prototype.slice.call(self.listElements).forEach(function (x) {
-            if (foundValues.indexOf(x.getAttribute("data-value")) != -1) {
-                x.classList.remove("disabled");
-            }
-        });
-    }
-    checkSelectMax(nrActives) {
-        let self = this;
-        if (self.maxSelect == Infinity || !self.isMultiple) return;
-        if (self.maxSelect <= nrActives) {
-            Array.prototype.slice.call(self.listElements).forEach(function (x) {
+    checkSelectMax(nrActives: number) {
+        if (this.maxSelect == Infinity || !this.isMultiple) return;
+        if (this.maxSelect <= nrActives) {
+            Array.from(this.listElements).forEach((x) => {
                 if (x.hasAttribute("data-value")) {
                     if (!x.classList.contains("disabled") && !x.classList.contains("active")) {
                         x.classList.add("overflow");
@@ -911,24 +558,23 @@ class VanillaSelectBox {
                 }
             });
         } else {
-            Array.prototype.slice.call(self.listElements).forEach(function (x) {
+            Array.from(this.listElements).forEach((x) => {
                 if (x.classList.contains("overflow")) {
                     x.classList.remove("overflow");
                 }
             });
         }
     }
-    checkUncheckFromChild(liClicked) {
-        let self = this;
-        let parentId = liClicked.getAttribute("data-parent");
-        let parentLi = document.getElementById(parentId);
-        if (!self.isMultiple) return;
-        let listElements = self.drop.querySelectorAll("li");
-        let childrenElements = Array.prototype.slice.call(listElements).filter(function (el) {
+    checkUncheckFromChild(liClicked: HTMLElement) {
+        const parentId = liClicked.getAttribute("data-parent");
+        const parentLi = document.getElementById(parentId);
+        if (!this.isMultiple) return;
+        const listElements = this.drop.querySelectorAll("li");
+        const childrenElements = Array.from(listElements).filter(function (el) {
             return el.hasAttribute("data-parent") && el.getAttribute("data-parent") == parentId && !el.classList.contains("hidden-search");
         });
         let nrChecked = 0;
-        let nrCheckable = childrenElements.length;
+        const nrCheckable = childrenElements.length;
         if (nrCheckable == 0) return;
         childrenElements.forEach(function (el) {
             if (el.classList.contains("active")) nrChecked++;
@@ -943,16 +589,15 @@ class VanillaSelectBox {
             parentLi.classList.remove("checked");
         }
     }
-    checkUncheckFromParent(liClicked) {
-        let self = this;
-        let parentId = liClicked.id;
-        if (!self.isMultiple) return;
-        let listElements = self.drop.querySelectorAll("li");
-        let childrenElements = Array.prototype.slice.call(listElements).filter(function (el) {
+    checkUncheckFromParent(liClicked: HTMLElement) {
+        const parentId = liClicked.id;
+        if (!this.isMultiple) return;
+        const listElements = this.drop.querySelectorAll("li");
+        const childrenElements = Array.from(listElements).filter(function (el) {
             return el.hasAttribute("data-parent") && el.getAttribute("data-parent") == parentId && !el.classList.contains("hidden-search");
         });
         let nrChecked = 0;
-        let nrCheckable = childrenElements.length;
+        const nrCheckable = childrenElements.length;
         if (nrCheckable == 0) return;
         childrenElements.forEach(function (el) {
             if (el.classList.contains("active")) nrChecked++;
@@ -960,7 +605,7 @@ class VanillaSelectBox {
         if (nrChecked === nrCheckable || nrChecked === 0) {
             //check all or uncheckAll : just do the opposite
             childrenElements.forEach(function (el) {
-                var event = document.createEvent("HTMLEvents");
+                const event = document.createEvent("HTMLEvents");
                 event.initEvent("click", true, false);
                 el.dispatchEvent(event);
             });
@@ -974,7 +619,7 @@ class VanillaSelectBox {
             liClicked.classList.remove("checked");
             childrenElements.forEach(function (el) {
                 if (!el.classList.contains("active")) {
-                    var event = document.createEvent("HTMLEvents");
+                    const event = document.createEvent("HTMLEvents");
                     event.initEvent("click", true, false);
                     el.dispatchEvent(event);
                 }
@@ -982,21 +627,20 @@ class VanillaSelectBox {
         }
     }
     checkUncheckAll() {
-        let self = this;
-        if (!self.isMultiple) return;
+        if (!this.isMultiple) return;
         let nrChecked = 0;
         let nrCheckable = 0;
         let totalAvailableElements = 0;
         let checkAllElement = null;
-        if (self.listElements == null) return;
-        Array.prototype.slice.call(self.listElements).forEach(function (x) {
+        if (this.listElements == null) return;
+        Array.from(this.listElements).forEach((x) => {
             if (x.hasAttribute("data-value")) {
                 if (x.getAttribute("data-value") === "all") {
                     checkAllElement = x;
                 }
                 if (x.getAttribute("data-value") !== "all" && !x.classList.contains("hidden-search") && !x.classList.contains("disabled")) {
                     nrCheckable++;
-                    nrChecked += x.classList.contains("active");
+                    nrChecked += x.classList.contains("active") ? 1 : 0;
                 }
                 if (x.getAttribute("data-value") !== "all" && !x.classList.contains("disabled")) {
                     totalAvailableElements++;
@@ -1008,34 +652,33 @@ class VanillaSelectBox {
             if (nrChecked === nrCheckable) {
                 // check the checkAll checkbox
                 if (nrChecked === totalAvailableElements) {
-                    self.title.textContent = self.userOptions.translations.all;
+                    this.title.textContent = this.userOptions.translations.all;
                 }
                 checkAllElement.classList.add("active");
-                checkAllElement.innerText = self.userOptions.translations.clearAll;
+                checkAllElement.innerText = this.userOptions.translations.clearAll;
                 checkAllElement.setAttribute("data-selected", "true");
             } else if (nrChecked === 0) {
                 // uncheck the checkAll checkbox
-                self.title.textContent = self.userOptions.placeHolder;
+                this.title.textContent = this.userOptions.placeHolder;
                 checkAllElement.classList.remove("active");
-                checkAllElement.innerText = self.userOptions.translations.selectAll;
+                checkAllElement.innerText = this.userOptions.translations.selectAll;
                 checkAllElement.setAttribute("data-selected", "false");
             }
         }
     }
     setValue(values) {
-        let self = this;
-        let listElements = self.drop.querySelectorAll("li");
+        const listElements = this.drop.querySelectorAll("li");
 
         if (values == null || values == undefined || values == "") {
-            self.empty();
+            this.empty();
         } else {
-            if (self.isMultiple) {
+            if (this.isMultiple) {
                 if (vanillaSelectBox_type(values) == "string") {
                     if (values === "all") {
                         values = [];
-                        Array.prototype.slice.call(listElements).forEach(function (x) {
+                        Array.from(listElements).forEach((x) => {
                             if (x.hasAttribute("data-value")) {
-                                let value = x.getAttribute("data-value");
+                                const value = x.getAttribute("data-value");
                                 if (value !== "all") {
                                     if (!x.classList.contains("hidden-search") && !x.classList.contains("disabled")) {
                                         values.push(x.getAttribute("data-value"));
@@ -1055,9 +698,9 @@ class VanillaSelectBox {
                         });
                     } else if (values === "none") {
                         values = [];
-                        Array.prototype.slice.call(listElements).forEach(function (x) {
+                        Array.from(listElements).forEach((x) => {
                             if (x.hasAttribute("data-value")) {
-                                let value = x.getAttribute("data-value");
+                                const value = x.getAttribute("data-value");
                                 if (value !== "all") {
                                     if (x.classList.contains("active")) {
                                         if (x.classList.contains("hidden-search") || x.classList.contains("disabled")) {
@@ -1073,9 +716,9 @@ class VanillaSelectBox {
                         values = values.split(",");
                     }
                 }
-                let foundValues = [];
+                const foundValues = [];
                 if (vanillaSelectBox_type(values) == "array") {
-                    Array.prototype.slice.call(self.options).forEach(function (x) {
+                    Array.from(this.options).forEach((x) => {
                         if (values.indexOf(x.value) !== -1) {
                             x.selected = true;
                             foundValues.push(x.value);
@@ -1087,7 +730,7 @@ class VanillaSelectBox {
                     let sep = "";
                     let nrActives = 0;
                     let nrAll = 0;
-                    Array.prototype.slice.call(listElements).forEach(function (x) {
+                    Array.from(listElements).forEach((x) => {
                         if (x.value !== "all") {
                             nrAll++;
                         }
@@ -1095,30 +738,30 @@ class VanillaSelectBox {
                             x.classList.add("active");
                             nrActives++;
                             selectedTexts += sep + x.getAttribute("data-text");
-                            sep = self.userOptions.buttonItemsSeparator;
+                            sep = this.userOptions.buttonItemsSeparator;
                         } else {
                             x.classList.remove("active");
                         }
                     });
-                    if (nrAll == nrActives - Number(!self.userOptions.disableSelectAll)) {
-                        let wordForAll = self.userOptions.translations.all;
+                    if (nrAll == nrActives - Number(!this.userOptions.disableSelectAll)) {
+                        const wordForAll = this.userOptions.translations.all;
                         selectedTexts = wordForAll;
-                    } else if (self.multipleSize != -1) {
-                        if (nrActives > self.multipleSize) {
-                            let wordForItems = nrActives === 1 ? self.userOptions.translations.item : self.userOptions.translations.items;
+                    } else if (this.multipleSize != -1) {
+                        if (nrActives > this.multipleSize) {
+                            const wordForItems = nrActives === 1 ? this.userOptions.translations.item : this.userOptions.translations.items;
                             selectedTexts = nrActives + " " + wordForItems;
                         }
                     }
-                    self.title.textContent = selectedTexts;
-                    self.privateSendChange();
+                    this.title.textContent = selectedTexts;
+                    this.privateSendChange();
                 }
-                self.checkUncheckAll();
+                this.checkUncheckAll();
             } else {
                 let found = false;
                 let text = "";
                 let className = "";
-                Array.prototype.slice.call(listElements).forEach(function (x) {
-                    let liVal = x.getAttribute("data-value");
+                Array.from(listElements).forEach((x) => {
+                    const liVal = x.getAttribute("data-value");
                     if (liVal == values) {
                         x.classList.add("active");
                         found = true;
@@ -1127,7 +770,7 @@ class VanillaSelectBox {
                         x.classList.remove("active");
                     }
                 });
-                Array.prototype.slice.call(self.options).forEach(function (x) {
+                Array.from(this.options).forEach((x) => {
                     if (x.value == values) {
                         x.selected = true;
                         className = x.getAttribute("class");
@@ -1137,35 +780,35 @@ class VanillaSelectBox {
                     }
                 });
                 if (found) {
-                    self.title.textContent = text;
-                    if (self.userOptions.placeHolder != "" && self.title.textContent == "") {
-                        self.title.textContent = self.userOptions.placeHolder;
+                    this.title.textContent = text;
+                    if (this.userOptions.placeHolder != "" && this.title.textContent == "") {
+                        this.title.textContent = this.userOptions.placeHolder;
                     }
                     if (className != "") {
-                        self.title.setAttribute("class", className + " title");
+                        this.title.setAttribute("class", className + " title");
                     } else {
-                        self.title.setAttribute("class", "title");
+                        this.title.setAttribute("class", "title");
                     }
                 }
             }
         }
     }
     privateSendChange() {
-        let event = document.createEvent("HTMLEvents");
+        const event = document.createEvent("HTMLEvents");
         event.initEvent("change", true, false);
         this.root.dispatchEvent(event);
     }
     empty() {
-        Array.prototype.slice.call(this.listElements).forEach(function (x) {
+        Array.from(this.listElements).forEach((x) => {
             x.classList.remove("active");
         });
-        let parentElements = this.drop.querySelectorAll("li.grouped-option");
+        const parentElements = this.drop.querySelectorAll("li.grouped-option");
         if (parentElements) {
-            Array.prototype.slice.call(parentElements).forEach(function (x) {
+            Array.from(parentElements).forEach((x) => {
                 x.classList.remove("checked");
             });
         }
-        Array.prototype.slice.call(this.options).forEach(function (x) {
+        Array.from(this.options).forEach((x) => {
             x.selected = false;
         });
         this.title.textContent = "";
@@ -1176,7 +819,7 @@ class VanillaSelectBox {
         this.privateSendChange();
     }
     destroy() {
-        let already = document.getElementById("btn-group-" + this.rootToken);
+        const already = document.getElementById("btn-group-" + this.rootToken);
         if (already) {
             VSBoxCounter.remove(this.instanceOffset);
             already.remove();
@@ -1188,7 +831,7 @@ class VanillaSelectBox {
             e.preventDefault();
             e.stopPropagation();
         });
-        let already = document.getElementById("btn-group-" + this.rootToken);
+        const already = document.getElementById("btn-group-" + this.rootToken);
         if (already) {
             const button = already.querySelector("button");
             if (button) button.classList.add("disabled");
@@ -1196,19 +839,16 @@ class VanillaSelectBox {
         }
     }
     enable() {
-        let already = document.getElementById("btn-group-" + this.rootToken);
+        const already = document.getElementById("btn-group-" + this.rootToken);
         if (already) {
             const button = already.querySelector("button");
             if (button) button.classList.remove("disabled");
             this.isDisabled = false;
         }
     }
-    showOptions() {
-        console.log(this.userOptions);
-    }
 }
 
-function vanillaSelectBox_type(target: any) {
+function vanillaSelectBox_type(target: object | string | object[] | string[]) {
     const computedType = Object.prototype.toString.call(target);
     const stripped = computedType.replace("[object ", "").replace("]", "");
     const lowercased = stripped.toLowerCase();

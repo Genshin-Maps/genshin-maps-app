@@ -5,7 +5,7 @@
     import { unsafeWindow } from "@monkey";
     import { images } from "@/renderer/addons/assets/img/images";
 
-    let active: boolean = false;
+    let active = false;
     let layerScale = unsafeWindow.MAPS_ViewSize / unsafeWindow.MAPS_Size;
 
     function getImageX(image: BackgroundImage) {

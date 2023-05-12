@@ -1,3 +1,5 @@
+import type { LibraryObject } from "ffi-napi";
+
 export type AppConfig = {
     autoAppUpdate: boolean;
     autoLibUpdate: boolean;
@@ -12,12 +14,12 @@ export type AppInfo = {
 };
 
 export type WorkerManagerConfig = {
-    onTrackData?: (data: any) => void;
+    onTrackData?: (data: WorkerEventData) => void;
 };
 
 export type WorkerEvent = {
     event: string;
-    data: any;
+    data: WorkerEventData;
 };
 
 export type CvatTrackData = {
@@ -29,7 +31,11 @@ export type CvatTrackData = {
     err: CvatTrackError;
 };
 
+export type WorkerEventData = CvatTrackData | string | { echo: string };
+
 export type CvatTrackError = {
     errorCode?: number;
     errorList?: string[];
 };
+
+export type CvatLibrary = LibraryObject | null;
