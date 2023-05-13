@@ -1,5 +1,6 @@
 import type { ElectronAPI } from "@electron-toolkit/preload";
-import type { AppConfig } from "@t/backend";
+import type { IpcRendererEvent } from "electron";
+import type { AppInfo, AppConfig, CvatTrackData } from "@t/backend";
 
 export type Handler = (property: PropertyKey, value: unknown) => void;
 
@@ -14,11 +15,28 @@ interface Bridge {
     getAppInfo: () => Promise<AppInfo>;
     getConfig: () => Promise<AppConfig>;
     setConfig: (config: AppConfig) => Promise<AppConfig>;
-    onUpdate: (callback: (event: IpcRendererEvent, args: unknown) => void) => Electron.IpcRenderer;
+    onUpdate: (callback: (event: IpcRendererEvent | RendererEvent, args: unknown) => void) => Electron.IpcRenderer | void;
     startTrack: () => Promise<void>;
     stopTrack: () => Promise<void>;
-    onTrack: (callback: (event: IpcRendererEvent, args: CvatTrackData) => void) => Electron.IpcRenderer;
+    onTrack: (callback: (event: IpcRendererEvent | RendererEvent, args: CvatTrackData) => void) => Electron.IpcRenderer | void;
 }
+
+type RendererEvent = {
+    type: string;
+    detail: unknown;
+};
+
+type MenuItem = {
+    type?: string;
+    label: string;
+    icon?: string;
+    logo?: ConstructorOfATypedSvelteComponent;
+    accelerator?: string;
+    submenu?: MenuItem[];
+    enabled?: boolean;
+    click?: (MenuItem) => void;
+    class?: () => string;
+};
 
 type MapData = {
     blockKey: string;

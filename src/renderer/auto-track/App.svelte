@@ -2,7 +2,6 @@
     import "@/renderer/auto-track/assets/style.scss";
     import { onMount } from "svelte";
     import { unsafeWindow } from "@monkey";
-    import Menu from "@/renderer/auto-track/menu/index.svelte";
     import UserMarker from "@/renderer/auto-track/marker/index.svelte";
 
     let userMarker: UserMarker;
@@ -32,6 +31,5 @@
 </script>
 
 <template>
-    <Menu />
     <UserMarker bind:this={userMarker} />
 </template>

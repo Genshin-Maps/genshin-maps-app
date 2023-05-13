@@ -2,7 +2,7 @@ import path from "node:path";
 import { app, BrowserWindow, ipcMain, Menu, dialog } from "electron";
 import { menu } from "@/backend/menu";
 import { render } from "@/backend/renderer";
-import { getAppInfoHandler, getConfigHandler, setConfigHandler, startTrackHandler, stopTrackHandler } from "@/backend/handlers";
+import { setHandlers } from "@/backend/handlers";
 
 // --- Deep link
 if (process.defaultApp) {
@@ -18,8 +18,9 @@ export let mainWindow: BrowserWindow | null = null;
 const createWindow = (): BrowserWindow => {
     // Create the browser window.
     const win = new BrowserWindow({
-        width: 800,
-        height: 600,
+        width: 1024,
+        height: 768,
+        frame: false,
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true,
@@ -106,16 +107,7 @@ function start() {
 
     app.setUserTasks([]);
 
-    // --- App Info
-    ipcMain.handle("get-app-info", getAppInfoHandler);
-
-    // --- Config
-    ipcMain.handle("get-config", getConfigHandler);
-    ipcMain.handle("set-config", setConfigHandler);
-
-    // --- Autotrack
-    ipcMain.handle("start-track", startTrackHandler);
-    ipcMain.handle("stop-track", stopTrackHandler);
+    setHandlers();
 }
 
 try {

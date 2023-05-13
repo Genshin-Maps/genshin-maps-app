@@ -16,7 +16,7 @@ class IpcHelper {
     }
 
     on(channel: string) {
-        return (callback: (event: IpcRendererEvent, args: CvatTrackData) => void) => ipcRenderer.on(channel, callback);
+        return (callback: (event: IpcRendererEvent, args: CvatTrackData) => void) => this.ipcRenderer.on(channel, callback);
     }
 }
 

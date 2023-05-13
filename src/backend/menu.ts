@@ -1,8 +1,40 @@
 import { app, Menu, MenuItem, MenuItemConstructorOptions } from "electron";
 import { mainWindow } from "@/backend";
-import { checkForUpdates } from "@/backend/updater";
+// import { checkForUpdates as updaterCheckForUpdates } from "@/backend/updater";
 
-let alwaysOnTop = false;
+export function toggleAlwaysOnTop() {
+    if (!mainWindow) return;
+    mainWindow.setAlwaysOnTop(!mainWindow.isAlwaysOnTop(), "screen-saver");
+    mainWindow.webContents.executeJavaScript("window.$store.isAlwaysOnTop.toggle();");
+}
+
+export function checkforUpdates() {
+    // updaterCheckForUpdates(menuItem);
+}
+
+export function minimizeWindow() {
+    if (!mainWindow) return;
+    mainWindow.minimize();
+}
+
+export function toggleMaximizeRestoreWindow() {
+    if (!mainWindow) return;
+    if (mainWindow.isMaximized()) {
+        mainWindow.unmaximize();
+    } else {
+        mainWindow.maximize();
+    }
+}
+
+export function openDevTools() {
+    if (!mainWindow) return;
+    mainWindow.webContents.openDevTools();
+}
+
+export function appQuit() {
+    app.quit();
+}
+
 const template: (MenuItemConstructorOptions | MenuItem)[] = [];
 template.push(
     {
@@ -10,7 +42,7 @@ template.push(
         submenu: [
             {
                 label: "Quit",
-                accelerator: "Command+Q",
+                accelerator: process.platform === "darwin" ? "Cmd+W" : "Alt+W",
                 click() {
                     app.quit();
                 },
@@ -25,13 +57,7 @@ template.push(
                 label: "Always on top",
                 role: "help",
                 accelerator: process.platform === "darwin" ? "Cmd+T" : "Alt+T",
-                click: () => {
-                    alwaysOnTop = !alwaysOnTop;
-                    if (mainWindow) {
-                        mainWindow.setAlwaysOnTop(alwaysOnTop, "screen-saver");
-                        mainWindow.setMenuBarVisibility(!alwaysOnTop);
-                    }
-                },
+                click: toggleAlwaysOnTop,
             },
             {
                 label: "Toggle Underground Map",
@@ -59,13 +85,7 @@ template.push(
                 id: "check_update",
                 label: "Check for updates",
                 role: "help",
-                click: (menuItem, BrowserWindow, event) => {
-                    checkForUpdates(menuItem, BrowserWindow, event);
-                },
-            },
-            {
-                label: "About",
-                role: "about",
+                click: checkforUpdates,
             },
         ],
     },
