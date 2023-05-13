@@ -21,6 +21,25 @@ class IpcHelper {
 }
 
 const ipcHelper = new IpcHelper(ipcRenderer);
+import type { CvatTrackData } from "@t/backend";
+
+class IpcHelper {
+    ipcRenderer: IpcRenderer;
+
+    constructor(ipcRenderer: IpcRenderer) {
+        this.ipcRenderer = ipcRenderer;
+    }
+
+    invoke(channel: string) {
+        return (...args: unknown[]) => this.ipcRenderer.invoke(channel, ...args).catch((err) => console.error(err));
+    }
+
+    on(channel: string) {
+        return (callback: (event: IpcRendererEvent, args: CvatTrackData) => void) => ipcRenderer.on(channel, callback);
+    }
+}
+
+const ipcHelper = new IpcHelper(ipcRenderer);
 
 // 프런트엔드에서 사용할 수 있는 API를 노출시킨다.
 // preload.js에서는 context가 renderer process이므로, backend에서 사용할 수 있는 전역 값 등을 사용할 수 없다.
