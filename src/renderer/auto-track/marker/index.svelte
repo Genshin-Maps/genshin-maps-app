@@ -1,7 +1,7 @@
 <script lang="ts">
     import { isPinned, currnetMap } from "@/renderer/auto-track/stores";
-    // import { type CvatTrackData } from "@t/backend";
-    // import { type IpcRendererEvent } from "electron";
+    import type { CvatTrackData } from "@t/backend";
+    import type { IpcRendererEvent } from "electron";
     import { onDestroy, onMount } from "svelte";
     import { unsafeWindow } from "@monkey";
     import { setFocusScroll, setFocusPoint } from "@/renderer/auto-track/marker";
@@ -32,7 +32,7 @@
         }),
     );
 
-    function onTrack(_event: any, data: any) {
+    function onTrack(_event: IpcRendererEvent, data: CvatTrackData) {
         // TODO: 작업 필요
         let { m, x, y, r: rot, a: dir, err } = data;
         if (err) {

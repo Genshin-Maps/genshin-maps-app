@@ -1,6 +1,8 @@
 import type { ElectronAPI } from "@electron-toolkit/preload";
 import type { AppConfig } from "@t/backend";
 
+export type Handler = (property: PropertyKey, value: unknown) => void;
+
 export type BackgroundImage = {
     name: string;
     url: string;
@@ -12,11 +14,74 @@ interface Bridge {
     getAppInfo: () => Promise<AppInfo>;
     getConfig: () => Promise<AppConfig>;
     setConfig: (config: AppConfig) => Promise<AppConfig>;
-    onUpdate: (callback: (event: IpcRendererEvent, args: any) => void) => Electron.IpcRenderer;
+    onUpdate: (callback: (event: IpcRendererEvent, args: unknown) => void) => Electron.IpcRenderer;
     startTrack: () => Promise<void>;
     stopTrack: () => Promise<void>;
     onTrack: (callback: (event: IpcRendererEvent, args: CvatTrackData) => void) => Electron.IpcRenderer;
 }
+
+type MapData = {
+    blockKey: string;
+    blockLeft: number;
+    blockTop: number;
+    boxLeft: number;
+    boxTop: number;
+    content: string;
+    id: string;
+    image: string;
+    pin: number;
+    point: number;
+    state: boolean;
+    tag: string[];
+    x: number;
+    y: number;
+    category?: string;
+};
+
+type MapsState = {
+    doubleTouch: boolean;
+    fadeEffect: boolean;
+    focusPoint: HTMLDivElement | null;
+    iframe: boolean;
+    mapsText: boolean;
+    orientation: string;
+    pinGroup: boolean;
+    shortcut: { Control: boolean };
+};
+
+type MapsViewPin = Set<string>;
+
+type PinLoad = {
+    colorIndex: number;
+    colorValue: string;
+    creator: string;
+    draw: HTMLDivElement;
+    group: number;
+    iconIndex: number;
+    iconValue: string;
+    id: string;
+    index: number;
+    lineValue: boolean;
+    mapData: MapData[];
+    mapName: string;
+    maps: string;
+    name: string;
+    offcombine: boolean;
+    opacityValue: number;
+    origin: string;
+    server: string;
+    sizeValue: number;
+    timer: boolean;
+    type: number;
+    version: number;
+    category: { [string]: string };
+};
+
+type MapsPinLoad = PinLoad[] & {
+    observe: (Handler) => void;
+};
+
+type MapsPinDraw = Map<string, MapData[]>;
 
 declare global {
     interface Window {
@@ -33,19 +98,19 @@ declare global {
         MAPS_RelativeY: number;
         MAPS_ViewMobile: boolean;
         MAPS_Type: string;
-        MAPS_State: any;
-        MAPS_ViewPin: any;
-        MAPS_PinLoad: any;
-        MAPS_PinDraw: any;
-        drawMapsScale: (...args: any) => void;
-        drawMapsLayer: (...args: any) => void;
-        drawPinObject: (...args: any) => void;
-        setPinObjectRefresh: (...args: any) => void;
-        changeMapsType: (...args: any) => void;
-        removePin: (...args: any) => void;
+        MAPS_State: MapsState;
+        MAPS_ViewPin: MapsViewPin;
+        MAPS_PinLoad: MapsPinLoad;
+        MAPS_PinDraw: MapsPinDraw;
+        drawMapsScale: (...args: unknown[]) => void;
+        drawMapsLayer: (...args: unknown[]) => void;
+        drawPinObject: (...args: unknown[]) => HTMLDivElement;
+        setPinObjectRefresh: (...args: unknown[]) => void;
+        changeMapsType: (...args: unknown[]) => void;
+        removePin: (...args: unknown[]) => void;
 
         electron: ElectronAPI;
         bridge: Bridge;
-        $store: any;
+        $store: unknown;
     }
 }

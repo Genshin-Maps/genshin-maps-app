@@ -9,8 +9,8 @@
     function init() {
         unsafeWindow.drawMapsScale = (function (originDrawMapsScale) {
             "use strict";
-            return (args: any) => {
-                const ret = originDrawMapsScale.apply(this, [args]);
+            return (...args: unknown[]) => {
+                const ret = originDrawMapsScale.apply(this, args);
                 userMarker.onScaleChange();
                 return ret;
             };
@@ -18,8 +18,8 @@
 
         unsafeWindow.changeMapsType = (function (originChangeMapsType) {
             "use strict";
-            return (args: any) => {
-                const ret = originChangeMapsType.apply(this, [args]);
+            return (...args: unknown[]) => {
+                const ret = originChangeMapsType.apply(this, args);
                 // site.onChangeMap.apply(site, [args]);
                 return ret;
             };

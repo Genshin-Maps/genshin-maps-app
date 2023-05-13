@@ -10,6 +10,7 @@
     import FilterPin from "@/renderer/addons/filter-pin/index.svelte";
     import UndergroundMap from "@/renderer/addons/underground-map/index.svelte";
     import { makeObservable } from "@/renderer/addons/observable";
+    import type { MapData, PinLoad } from "@t/renderer";
 
     let chestFilter: VanillaSelectBox;
     let filterPin: FilterPin;
@@ -30,9 +31,9 @@
             "use strict";
 
             const _proxyLoadedPin = () => {
-                isChestPinLoaded.set(unsafeWindow.MAPS_PinLoad.filter((value: any) => value.name?.includes("보물상자")).length > 0);
+                isChestPinLoaded.set(unsafeWindow.MAPS_PinLoad.filter((value: PinLoad) => value.name?.includes("보물상자")).length > 0);
                 unsafeWindow.MAPS_PinLoad = makeObservable(unsafeWindow.MAPS_PinLoad);
-                unsafeWindow.MAPS_PinLoad.observe((_: number, value: any) => {
+                unsafeWindow.MAPS_PinLoad.observe((_: number, value: PinLoad) => {
                     if (Object.prototype.toString.call(value) == "[object Object]" && value.name?.includes("보물상자")) {
                         isChestPinLoaded.set(true);
                     }
@@ -52,12 +53,12 @@
 
         const selectedValues = chestFilter.getResult();
         const OBJECT_PIN_LAYER = document.getElementById("mapsLayerPoint");
-        unsafeWindow.MAPS_ViewPin.forEach((v: any) => {
+        unsafeWindow.MAPS_ViewPin.forEach((v: string) => {
             const arrDrawPin = unsafeWindow.MAPS_PinDraw.get(v);
             if (Object.prototype.toString.call(arrDrawPin) != "[object Array]" || arrDrawPin.length <= 0) return true;
 
-            let mapPinGroup = new Map();
-            arrDrawPin.forEach((point: any) => {
+            let mapPinGroup = new Map<number, { x: number; y: number; state: number; length: number; points: MapData[]; point: MapData }>();
+            arrDrawPin.forEach((point: MapData) => {
                 const arrPinData = unsafeWindow.MAPS_PinLoad[point.pin];
                 if (point.category && arrPinData.category[point.category]) {
                     const arrCategory = arrPinData.category[point.category];
@@ -112,9 +113,8 @@
                         length++;
                     }
 
-                    let objectPoint: any;
+                    let objectPoint: HTMLDivElement;
                     if (length > 1) {
-                        console.log("redraw");
                         objectPoint = unsafeWindow.drawPinObject(true, value.point, arrData);
                         objectPoint.className = "maps-point group";
 

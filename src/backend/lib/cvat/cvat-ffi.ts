@@ -1,6 +1,8 @@
 import ffi from "@lwahonen/ffi-napi";
 import ref from "@lwahonen/ref-napi";
 import array from "ref-array-di";
+import logger from "electron-log";
+import type { CvatLibrary } from "@t/backend";
 
 export const ArrayType = array(ref);
 export const bool = ref.types.bool;
@@ -14,8 +16,8 @@ export const byteArray = ArrayType(ref.types.byte);
 export const string = ref.types.CString;
 export const stringPtr = ref.refType(string);
 
-export function loadCvatLibrary(libPath: string): any {
-    console.log(libPath);
+export function loadCvatLibrary(libPath: string): CvatLibrary {
+    logger.info(`load cvat library from: ${libPath}`);
     return ffi.Library(libPath, {
         verison: [bool, [byteArray]],
 

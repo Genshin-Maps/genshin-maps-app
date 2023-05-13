@@ -19,13 +19,13 @@ unsafeWindow.$store = (function () {
     }
 
     function _updateIsFilterPinActive(value: boolean) {
-        return isFilterPinActive.update((_) => value);
+        return isFilterPinActive.set(value);
     }
     function _updateIsUndergroundMapActive(value: boolean) {
-        return isUndergroundMapActive.update((_) => value);
+        return isUndergroundMapActive.set(value);
     }
     function _updateIsChestPinLoaded(value: boolean) {
-        return isChestPinLoaded.update((_) => value);
+        return isChestPinLoaded.set(value);
     }
 
     function _toggleIsFilterPinActive() {

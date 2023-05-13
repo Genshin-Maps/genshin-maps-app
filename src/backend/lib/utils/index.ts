@@ -1,11 +1,3 @@
-import axios from "axios";
-
-export const getURLContent = async (url: string) => {
-    return axios.get(url);
-};
-
-// const _sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
-export function isEmptyObject(param: any) {
+export function isEmptyObject(param: object) {
     return Object.keys(param).length === 0 && param.constructor === Object;
 }

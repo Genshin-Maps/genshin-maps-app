@@ -6,7 +6,7 @@
 
     let active: boolean;
     let images: Images;
-    let imagesWrapper: any;
+    let imagesWrapper: HTMLDivElement;
 
     const unsubscribe = isUndergroundMapActive.subscribe((value) => {
         active = value;
