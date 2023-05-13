@@ -1,5 +1,7 @@
 import path from "node:path";
-import { app, BrowserWindow, ipcMain, Menu, dialog } from "electron";
+import fs from "node:fs";
+import { app, BrowserWindow, Menu, dialog } from "electron";
+import logger from "electron-log";
 import { menu } from "@/backend/menu";
 import { render } from "@/backend/renderer";
 import { setHandlers } from "@/backend/handlers";
@@ -14,6 +16,12 @@ if (process.defaultApp) {
 }
 
 // ---
+const loadWindow = (win: BrowserWindow): void => {
+    win.loadURL("https://genshin.gamedot.org/?mid=genshinmaps")
+        .then(() => render(win))
+        .catch((err) => logger.error(err));
+};
+
 export let mainWindow: BrowserWindow | null = null;
 const createWindow = (): BrowserWindow => {
     // Create the browser window.
@@ -29,14 +37,22 @@ const createWindow = (): BrowserWindow => {
     });
 
     // Load a remote URL
-    win.loadURL("https://genshin.gamedot.org/?mid=genshinmaps")
-        .then(() => render(win))
-        .catch((err) => console.error(err));
+    loadWindow(win);
 
     // --- Window 이벤트
 
     // Open the DevTools.
-    win.webContents.openDevTools();
+    if (import.meta.env?.MODE === "development") {
+        win.webContents.openDevTools();
+        (async () => {
+            const rendererFilePath = path.join(__dirname, "../renderer/index.cjs");
+            logger.log(`watching: ${rendererFilePath}`);
+            const watcher = fs.watch(rendererFilePath);
+            watcher.on("change", () => {
+                loadWindow(win);
+            });
+        })();
+    }
 
     win.webContents.setWindowOpenHandler(() => {
         return {
