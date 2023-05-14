@@ -9,6 +9,7 @@ declare module "@lwahonen/ref-napi" {
 }
 
 declare module "@monkey" {
-    export * from "vite-plugin-monkey/dist/client";
     export declare const unsafeWindow: Window;
 }
+
+declare module "$" {}

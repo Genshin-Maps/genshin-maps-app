@@ -731,7 +731,8 @@ class VanillaSelectBox {
                     let nrActives = 0;
                     let nrAll = 0;
                     Array.from(listElements).forEach((x) => {
-                        if (x.value !== "all") {
+                        const value = x.getAttribute("data-value");
+                        if (value !== "all") {
                             nrAll++;
                         }
                         if (foundValues.indexOf(x.getAttribute("data-value")) != -1) {
