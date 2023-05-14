@@ -41,7 +41,7 @@ export async function build(config: UserConfig = {}, buildInfo: BuildInfo) {
 
 try {
     const configEnv: ConfigEnv = {
-        mode: "production",
+        mode: "userscript",
         command: "build",
     };
     const config = await (typeof userConfig === "function" ? userConfig(configEnv) : userConfig);
