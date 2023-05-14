@@ -16,7 +16,7 @@
         "typecheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
         "svelte-check": "svelte-check --tsconfig ./tsconfig.json",
         "typecheck": "pnpm run typecheck:node && pnpm run svelte-check",
-        "start": "ts-node -P script/tsconfig.json script/start.ts",
+        "start": "pnpm run typecheck && ts-node -P script/tsconfig.json script/start.ts",
         "vite:build": "pnpm run vite:main && pnpm run vite:preload && pnpm run vite:renderer",
         "vite:main": "vite build -c ./config/main.vite.config.ts",
         "vite:preload": "vite build -c ./config/preload.vite.config.ts",
