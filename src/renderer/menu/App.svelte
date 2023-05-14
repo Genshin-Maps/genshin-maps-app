@@ -138,8 +138,15 @@
                 submenu: [
                     {
                         label: "업데이트 확인",
-                        click: (menuItem: MenuItem) => {
-                            ipcRenderer.send("check-for-updates", JSON.stringify(menuItem));
+                        click: (menuItem: MenuItem, menuItems: MenuItem[]) => {
+                            menuItem.enabled = false;
+                            topMenus = menuItems;
+                            ipcRenderer.invoke("check-for-updates", JSON.stringify(menuItem)).then(() => {
+                                setTimeout(() => {
+                                    menuItem.enabled = true;
+                                    topMenus = menuItems;
+                                }, 1000);
+                            });
                         },
                     },
                     {
@@ -181,6 +188,7 @@
                 },
             },
         );
+        topMenus = topMenus;
     }
 
     onMount(() => {
@@ -222,9 +230,9 @@
                         <ul class="submenu">
                             {#each menu.submenu as submenu}
                                 <li
-                                    class="submenu-item {submenu?.enabled && !submenu.enabled ? 'disabled' : ''}"
+                                    class="submenu-item {submenu?.enabled !== false ? '' : 'disabled'}"
                                     on:click={() => {
-                                        if (submenu?.click) submenu.click(submenu);
+                                        if (submenu?.click) submenu.click(submenu, topMenus);
                                     }}
                                 >
                                     <span class="submenu-item-text">{submenu.label}</span>

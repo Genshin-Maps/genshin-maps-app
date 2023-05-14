@@ -34,7 +34,7 @@ type MenuItem = {
     accelerator?: string;
     submenu?: MenuItem[];
     enabled?: boolean;
-    click?: (MenuItem) => void;
+    click?: (menuItem?: MenuItem, menuItems?: MenuItem[]) => void;
     class?: () => string;
 };
 

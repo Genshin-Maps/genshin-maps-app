@@ -2,11 +2,11 @@
     display: none !important;
 }
 
-li[data-parent].closed {
+.vsb-menu li[data-parent].closed {
     display: none !important;
 }
 
-li[data-parent].open:not(.hidden-search) {
+.vsb-menu li[data-parent].open:not(.hidden-search) {
     display: block !important;
 }
 
@@ -67,19 +67,19 @@ li[data-parent].open:not(.hidden-search) {
     overflow-y: auto;
 }
 
-li.disabled {
+.vsb-menu li.disabled {
     cursor: not-allowed;
     opacity: 0.3;
     background-color: #999;
 }
 
-li.overflow {
+.vsb-menu li.overflow {
     cursor: not-allowed;
     opacity: 0.3;
     background-color: #999;
 }
 
-li.short {
+.vsb-menu li.short {
     overflow: hidden;
     text-overflow: ellipsis;
 }
@@ -262,6 +262,6 @@ li.short {
     border-left: 4px solid transparent;
 }
 
-li[data-parent] {
+.vsb-menu li[data-parent] {
     padding-left: 50px !important;
 }
