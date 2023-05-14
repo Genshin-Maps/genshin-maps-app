@@ -13,6 +13,16 @@ export async function build(config: UserConfig = {}, buildInfo: BuildInfo) {
     config.plugins = config.plugins || [];
     config.plugins = config.plugins.slice(0, -1);
 
+    config.define = {
+        "process.env": Object.assign(
+            {},
+            {
+                VITE_USERSCRIPT: true,
+            },
+            process.env,
+        ),
+    };
+
     const userscript = buildInfo.getUserscriptConfig();
     userscript.version = buildInfo.getVersion();
     config.plugins.push(
