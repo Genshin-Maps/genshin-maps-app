@@ -1,30 +1,31 @@
-import { type IpcMainInvokeEvent, app } from "electron";
+import { type IpcMainInvokeEvent, app, ipcMain } from "electron";
 import type { AppConfig, AppInfo } from "@t/backend";
 import { mainWindow } from "@/backend";
 import { getConfig, setConfig } from "@/backend/config";
 import { LibCvat } from "@/backend/lib/cvat";
 import { CvatWorkerManager } from "@/backend/lib/cvat/cvatWorkerManager";
+import { toggleAlwaysOnTop, checkforUpdates, minimizeWindow, toggleMaximizeRestoreWindow, openDevTools, appQuit } from "@/backend/menu";
 
 const cvat = LibCvat.instance;
 cvat.load();
 
-export function getAppInfoHandler(): AppInfo {
+function getAppInfoHandler(): AppInfo {
     return {
         appVersion: app.getVersion(),
         libVersion: cvat.GetCompileVersion(),
     };
 }
 
-export function getConfigHandler(): AppConfig {
+function getConfigHandler(): AppConfig {
     return getConfig();
 }
 
-export function setConfigHandler(_event: IpcMainInvokeEvent, config: AppConfig): AppConfig {
+function setConfigHandler(_event: IpcMainInvokeEvent, config: AppConfig): AppConfig {
     setConfig(config);
     return getConfig();
 }
 
-export function startTrackHandler(): void {
+function startTrackHandler(): void {
     const libManager = CvatWorkerManager.instance;
     libManager.init({
         onTrackData: (data) => {
@@ -35,7 +36,28 @@ export function startTrackHandler(): void {
     libManager.startTrack();
 }
 
-export function stopTrackHandler(): void {
+function stopTrackHandler(): void {
     const libManager = CvatWorkerManager.instance;
     libManager.stopTrack();
+}
+
+export function setHandlers(): void {
+    // --- App Info
+    ipcMain.handle("get-app-info", getAppInfoHandler);
+
+    // --- Config
+    ipcMain.handle("get-config", getConfigHandler);
+    ipcMain.handle("set-config", setConfigHandler);
+
+    // --- Autotrack
+    ipcMain.handle("start-track", startTrackHandler);
+    ipcMain.handle("stop-track", stopTrackHandler);
+
+    // --- Menu Handlers
+    ipcMain.on("toggle-always-on-top", toggleAlwaysOnTop);
+    ipcMain.on("check-for-updates", checkforUpdates);
+    ipcMain.on("minimize", minimizeWindow);
+    ipcMain.on("toggle-maximize", toggleMaximizeRestoreWindow);
+    ipcMain.on("open-devtools", openDevTools);
+    ipcMain.on("app-quit", appQuit);
 }
