@@ -1,6 +1,6 @@
 import { app, Menu, MenuItem, MenuItemConstructorOptions } from "electron";
 import { mainWindow } from "@/backend";
-// import { checkForUpdates as updaterCheckForUpdates } from "@/backend/updater";
+import { checkForUpdates as updaterCheckForUpdates } from "@/backend/updater";
 
 export function toggleAlwaysOnTop() {
     if (!mainWindow) return;
@@ -9,7 +9,7 @@ export function toggleAlwaysOnTop() {
 }
 
 export function checkforUpdates() {
-    // updaterCheckForUpdates(menuItem);
+    updaterCheckForUpdates();
 }
 
 export function minimizeWindow() {

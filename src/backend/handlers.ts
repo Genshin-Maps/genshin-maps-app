@@ -7,7 +7,6 @@ import { CvatWorkerManager } from "@/backend/lib/cvat/cvatWorkerManager";
 import { toggleAlwaysOnTop, checkforUpdates, minimizeWindow, toggleMaximizeRestoreWindow, openDevTools, appQuit } from "@/backend/menu";
 
 const cvat = LibCvat.instance;
-cvat.load();
 
 function getAppInfoHandler(): AppInfo {
     return {
@@ -41,7 +40,9 @@ function stopTrackHandler(): void {
     libManager.stopTrack();
 }
 
-export function setHandlers(): void {
+export async function setHandlers(): Promise<void> {
+    await cvat.load();
+
     // --- App Info
     ipcMain.handle("get-app-info", getAppInfoHandler);
 
@@ -55,7 +56,7 @@ export function setHandlers(): void {
 
     // --- Menu Handlers
     ipcMain.on("toggle-always-on-top", toggleAlwaysOnTop);
-    ipcMain.on("check-for-updates", checkforUpdates);
+    ipcMain.handle("check-for-updates", checkforUpdates);
     ipcMain.on("minimize", minimizeWindow);
     ipcMain.on("toggle-maximize", toggleMaximizeRestoreWindow);
     ipcMain.on("open-devtools", openDevTools);

@@ -1,10 +1,18 @@
 import path from "node:path";
 import fs from "node:fs";
-import { app, BrowserWindow, Menu, dialog } from "electron";
+import { app, BrowserWindow, Menu, dialog, shell } from "electron";
 import logger from "electron-log";
 import { menu } from "@/backend/menu";
 import { render } from "@/backend/renderer";
 import { setHandlers } from "@/backend/handlers";
+import { set } from "ref-napi";
+
+const allowOrigins = ["https://members.gamedot.org", "https://genshin.gamedot.org", "https://nid.naver.com", "https://accounts.kakao.com"];
+function isSafeForExternalOpen(url: string) {
+    const parsedUrl = new URL(url);
+
+    return parsedUrl.protocol === "https:" && allowOrigins.includes(parsedUrl.origin);
+}
 
 // --- Deep link
 if (process.defaultApp) {
@@ -48,19 +56,29 @@ const createWindow = (): BrowserWindow => {
             const rendererFilePath = path.join(__dirname, "../renderer/index.cjs");
             logger.log(`watching: ${rendererFilePath}`);
             const watcher = fs.watch(rendererFilePath);
+
+            let fsWait = false;
             watcher.on("change", () => {
-                loadWindow(win);
+                setImmediate(() => {
+                    if (fsWait) return;
+                    fsWait = true;
+                    logger.log("reloading the window");
+                    loadWindow(win);
+                    setTimeout(() => {
+                        fsWait = false;
+                    }, 1000);
+                });
             });
         })();
     }
 
-    win.webContents.setWindowOpenHandler(() => {
-        return {
-            action: "allow",
-            overrideBrowserWindowOptions: {
-                parent: win,
-            },
-        };
+    win.webContents.setWindowOpenHandler(({ url }) => {
+        if (isSafeForExternalOpen(url)) {
+            setImmediate(() => {
+                shell.openExternal(url);
+            });
+        }
+        return { action: "deny" };
     });
 
     return win;
@@ -99,6 +117,8 @@ function start() {
                     mainWindow = createWindow();
                 }
             });
+
+            return setHandlers();
         })
         .catch((err) => console.error(err));
 
@@ -111,9 +131,7 @@ function start() {
     app.on("web-contents-created", (_, contents) => {
         contents.on("will-navigate", (event, navigationUrl) => {
             const parsedUrl = new URL(navigationUrl);
-
-            const allowOrigins = ["https://members.gamedot.org/", "https://genshin.gamedot.org/", "https://nid.naver.com", "https://accounts.kakao.com"];
-            if (!allowOrigins.includes(parsedUrl.origin)) {
+            if (!isSafeForExternalOpen(navigationUrl)) {
                 event.preventDefault();
             } else {
                 console.log(`navigate is blocked. origin: ${parsedUrl.origin}`);
@@ -122,8 +140,6 @@ function start() {
     });
 
     app.setUserTasks([]);
-
-    setHandlers();
 }
 
 try {

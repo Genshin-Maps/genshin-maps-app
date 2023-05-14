@@ -1,18 +1,10 @@
-import { app } from "electron";
 import path from "path";
 import { type Pointer, alloc } from "@lwahonen/ref-napi";
 import type { CvatTrackData, CvatTrackError, CvatLibrary } from "@t/backend";
-import { isEmptyObject } from "@/backend/lib/utils";
+import { isEmptyObject, getLibDirPath } from "@/backend/utils";
 import { loadCvatLibrary } from "@/backend/lib/cvat/cvat-ffi";
 
-let unpackedPath: string;
-if (app.isPackaged) {
-    const basePath = path.dirname(app.getAppPath());
-    unpackedPath = path.join(basePath, "app.asar.unpacked");
-} else {
-    unpackedPath = app.getAppPath();
-}
-const libPath = path.join(unpackedPath, "lib/cvAutoTrack/cvAutoTrack.dll");
+const libPath = path.join(getLibDirPath(), "cvAutoTrack.dll");
 
 // Cvat를 구현하는 싱글톤 클래스
 export class LibCvat {
@@ -28,10 +20,20 @@ export class LibCvat {
         if (!LibCvat._instance) LibCvat._instance = new LibCvat();
         return LibCvat._instance;
     }
-    public load(): boolean {
-        if (this._lib == null) this._lib = loadCvatLibrary(libPath);
-
-        return this._lib != null;
+    public async load(): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            if (this._lib == null) {
+                return loadCvatLibrary(libPath)
+                    .then((lib) => {
+                        this._lib = lib;
+                        return resolve(true);
+                    })
+                    .catch((err) => {
+                        return reject(err);
+                    });
+            }
+            return resolve(true);
+        });
     }
 
     public unload(): boolean {
