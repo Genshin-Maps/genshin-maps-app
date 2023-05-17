@@ -16,7 +16,7 @@ export default defineConfig(({ mode }) => {
         build: {
             outDir: "out/renderer",
             target: "chrome112",
-            minify: "esbuild",
+            minify: false,
             assetsInlineLimit: 0,
             modulePreload: { polyfill: false },
             rollupOptions: {

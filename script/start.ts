@@ -78,6 +78,7 @@ async function doBuild(config: UserConfig = {}, watchHook: () => void): Promise<
     return new Promise((resolve) => {
         let firstBundle = true;
         config.plugins = config.plugins || [];
+        config.build = config.build || {};
         config.build.watch = {};
 
         const closeBundle = (): void => {

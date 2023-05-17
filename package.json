@@ -34,7 +34,6 @@
         "@lwahonen/ffi-napi": "^4.0.12",
         "@lwahonen/ref-napi": "^4.0.8",
         "axios": "^1.4.0",
-        "lodash": "^4.17.21",
         "node-7z": "^3.0.0",
         "ref-array-di": "^1.2.2"
     },
@@ -45,7 +44,6 @@
         "@rollup/plugin-alias": "^5.0.0",
         "@sveltejs/vite-plugin-svelte": "^2.1.1",
         "@types/ffi-napi": "^4.0.7",
-        "@types/lodash": "^4.14.194",
         "@types/node": "^18.16.3",
         "@types/node-7z": "^2.1.5",
         "@types/ref-array-di": "^1.2.5",

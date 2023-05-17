@@ -11,5 +11,3 @@ declare module "@lwahonen/ref-napi" {
 declare module "@monkey" {
     export declare const unsafeWindow: Window;
 }
-
-declare module "$" {}

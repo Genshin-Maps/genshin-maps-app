@@ -13,9 +13,6 @@ dependencies:
   axios:
     specifier: ^1.4.0
     version: 1.4.0
-  lodash:
-    specifier: ^4.17.21
-    version: 4.17.21
   node-7z:
     specifier: ^3.0.0
     version: 3.0.0
@@ -42,9 +39,6 @@ devDependencies:
   '@types/ffi-napi':
     specifier: ^4.0.7
     version: 4.0.7
-  '@types/lodash':
-    specifier: ^4.14.194
-    version: 4.14.194
   '@types/node':
     specifier: ^18.16.3
     version: 18.16.3
@@ -774,10 +768,6 @@ packages:
     resolution: {integrity: sha512-BQ5aZNSCpj7D6K2ksrRCTmKRLEpnPvWDiLPfoGyhZ++8YtiK9d/3DBKPJgry359X/P1PfruyYwvnvwFjuEiEIg==}
     dependencies:
       '@types/node': 18.16.3
-    dev: true
-
-  /@types/lodash@4.14.194:
-    resolution: {integrity: sha512-r22s9tAS7imvBt2lyHC9B8AGwWnXaYb1tY09oyLkXDs4vArpYJzw09nj8MLx5VfciBPGIb+ZwG0ssYnEPJxn/g==}
     dev: true
 
   /@types/minimatch@5.1.2:
@@ -2926,6 +2916,7 @@ packages:
 
   /lodash@4.17.21:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
+    dev: true
 
   /log-symbols@4.1.0:
     resolution: {integrity: sha512-8XPvpAA8uyhfteu8pIvQxpJZ7SYYdpUivZpGy6sFsBuKRY/7rQGavedeB8aK+Zkyq6upMFVL/9AW6vOYzfRyLg==}

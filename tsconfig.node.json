@@ -1,5 +1,5 @@
 {
-    "include": ["config/*.vite.config.*", "plugins/**/*.ts", "src/backend/**/*", "src/preload/**/*", "@types/**/*.d.ts"],
+    "include": ["config/*.vite.config.*", "plugins/**/*.ts", "script/**/*.ts", "src/backend/**/*", "src/preload/**/*", "@types/**/*.d.ts", "package.json"],
     "compilerOptions": {
         "composite": true,
         "target": "esnext",
