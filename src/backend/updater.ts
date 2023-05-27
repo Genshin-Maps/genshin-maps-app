@@ -1,6 +1,6 @@
 import { dialog, type MenuItem } from "electron";
 import { autoUpdater } from "electron-updater";
-import { checkForUpdates as checkForCvatLibUpdates } from "@/backend/lib/cvat/cvat-updater";
+// import { checkForUpdates as checkForCvatLibUpdates } from "@/backend/lib/cvat/cvat-updater";
 
 let updater: MenuItem | null;
 autoUpdater.autoDownload = false;
@@ -51,7 +51,9 @@ function checkForUpdates() {
     // updater = menuItem;
     // updater.enabled = false;
     autoUpdater.checkForUpdates();
-    checkForCvatLibUpdates();
+
+    // TODO: 임시 주석처리
+    // checkForCvatLibUpdates();
 }
 
 export { checkForUpdates };

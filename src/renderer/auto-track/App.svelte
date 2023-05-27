@@ -26,7 +26,8 @@
     }
 
     onMount(() => {
-        init();
+        // TODO: 임시 주석처리
+        // init();
     });
 </script>
 
