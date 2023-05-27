@@ -19,6 +19,13 @@ interface Bridge {
     startTrack: () => Promise<void>;
     stopTrack: () => Promise<void>;
     onTrack: (callback: (event: IpcRendererEvent | RendererEvent, args: CvatTrackData) => void) => Electron.IpcRenderer | void;
+
+    checkForUpdates?: (menuItem: string) => Promise<void>;
+    toggleAlwaysOnTop?: () => void;
+    openDevTools?: () => void;
+    minimize?: () => void;
+    toggleMaximize?: () => void;
+    appQuit?: () => void;
 }
 
 type RendererEvent = {

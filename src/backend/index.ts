@@ -6,6 +6,7 @@ import { menu } from "@/backend/menu";
 import { render } from "@/backend/renderer";
 import { setHandlers } from "@/backend/handlers";
 
+app.commandLine.appendSwitch("charset", "utf-8");
 const allowOrigins = ["https://members.gamedot.org", "https://genshin.gamedot.org", "https://nid.naver.com", "https://accounts.kakao.com"];
 function isSafeForExternalOpen(url: string) {
     const parsedUrl = new URL(url);
@@ -40,6 +41,7 @@ const createWindow = (): BrowserWindow => {
             nodeIntegration: false,
             contextIsolation: true,
             preload: path.join(__dirname, "../preload/index.cjs"),
+            defaultEncoding: "utf-8",
         },
     });
 

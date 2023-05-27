@@ -23,7 +23,7 @@ type Asset = {
 const LIB_PATH = getLibDirPath();
 
 function extract7zFile(filepath: string, targetPath: string) {
-    const pathTo7zip = sevenBin.path7za;
+    const pathTo7zip = path.resolve(sevenBin.path7za).replace("app.asar", "app.asar.unpacked");
     const options = {
         recursive: true,
         targetDir: targetPath,

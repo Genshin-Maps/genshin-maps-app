@@ -6,7 +6,7 @@ files:
     - "!**/.vscode/*"
     - "!src/*"
     - "!config/*.vite.config.{js,ts,mjs,cjs}"
-    - "!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md,package-info.ts}"
+    - "!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc,dev-app-update.yml,CHANGELOG.md,README.md,package-info.ts}"
     - "!{.env,.env.*,.npmrc,pnpm-lock.yaml}"
     - "!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}"
     - "!lib/**/*"
@@ -19,6 +19,7 @@ asarUnpack:
 # afterSign: build/notarize.js
 win:
     executableName: Genshin Maps App
+    requestedExecutionLevel: requireAdministrator
 nsis:
     artifactName: ${name}-${version}-setup.${ext}
     shortcutName: ${productName}

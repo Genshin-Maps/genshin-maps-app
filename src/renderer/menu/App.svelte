@@ -39,6 +39,9 @@
         {
             label: "GPS",
             logo: LogoNavigation,
+            class: () => {
+                return "hide";
+            },
             submenu: [
                 {
                     label: "따라가기",
@@ -46,9 +49,9 @@
                         isPinned.update((v) => !v);
                     },
                     class: () => {
-                        // if (!pinned) {
-                        //     return "hide";
-                        // }
+                        if (!pinned) {
+                            return "hide";
+                        }
                         return "";
                     },
                 },
@@ -110,13 +113,13 @@
     let topMenus: MenuItem[] = menus.slice();
 
     if (import.meta.env?.VITE_USERSCRIPT !== true) {
-        const { ipcRenderer } = unsafeWindow.electron;
+        const { bridge } = unsafeWindow;
         alwaysOnTopMenu = {
             label: "항상 위에 표시",
             enabled: true,
             accelerator: "Alt+T",
             click: () => {
-                ipcRenderer.send("toggle-always-on-top");
+                bridge.toggleAlwaysOnTop();
             },
         };
         topMenus[1].submenu?.unshift(alwaysOnTopMenu);
@@ -127,7 +130,7 @@
                     label: "창 닫기",
                     accelerator: "Alt+W",
                     click() {
-                        ipcRenderer.send("app-quit");
+                        bridge.appQuit();
                     },
                 },
             ],
@@ -141,7 +144,7 @@
                         click: (menuItem: MenuItem, menuItems: MenuItem[]) => {
                             menuItem.enabled = false;
                             topMenus = menuItems;
-                            ipcRenderer.invoke("check-for-updates", JSON.stringify(menuItem)).then(() => {
+                            bridge.checkForUpdates(JSON.stringify(menuItem)).then(() => {
                                 setTimeout(() => {
                                     menuItem.enabled = true;
                                     topMenus = menuItems;
@@ -152,15 +155,15 @@
                     {
                         label: "개발자 도구 열기",
                         click: () => {
-                            ipcRenderer.send("open-devtools");
+                            bridge.openDevTools();
                         },
                     },
-                    {
-                        label: "About",
-                        click() {
-                            // ipcRenderer.send("app-about");
-                        },
-                    },
+                    // {
+                    //     label: "About",
+                    //     click() {
+                    //         bridge.appAbout();
+                    //     },
+                    // },
                 ],
             },
             {
@@ -168,7 +171,7 @@
                 label: "최소화",
                 icon: "fas fa-window-minimize",
                 click: () => {
-                    ipcRenderer.send("minimize");
+                    bridge.minimize();
                 },
             },
             {
@@ -176,7 +179,7 @@
                 label: "최대화",
                 icon: "fas fa-window-maximize",
                 click: () => {
-                    ipcRenderer.send("toggle-maximize");
+                    bridge.toggleMaximize();
                 },
             },
             {
@@ -184,7 +187,7 @@
                 label: "창 닫기",
                 icon: "fas fa-window-close",
                 click: () => {
-                    ipcRenderer.send("app-quit");
+                    bridge.appQuit();
                 },
             },
         );
@@ -213,7 +216,7 @@
         <ul class="menu">
             {#each topMenus as menu}
                 <li
-                    class="menu-item {menu?.type == 'window-control-button' ? 'window-control-button' : ''}"
+                    class="menu-item {menu?.type == 'window-control-button' ? 'window-control-button' : ''} {menu?.class ? menu.class() : ''}"
                     on:click={() => {
                         if (menu?.click) menu.click(menu);
                     }}
@@ -236,6 +239,9 @@
                                     }}
                                 >
                                     <span class="submenu-item-text">{submenu.label}</span>
+                                    {#if submenu.accelerator}
+                                        <span class="accelerator">{submenu.accelerator}</span>
+                                    {/if}
                                 </li>
                             {/each}
                         </ul>
@@ -249,7 +255,7 @@
     <div bind:this={sideMenu} class="maps-side-menu">
         <ul class="maps-side-menu-item">
             {#each menus as menu}
-                <li class="maps-menu submenu-item">
+                <li class="maps-menu submenu-item {menu?.class ? menu.class() : ''}">
                     {#if menu.logo}
                         <div class="maps-side-menu-icon">
                             <svelte:component this={menu.logo} />

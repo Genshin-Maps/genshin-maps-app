@@ -18,6 +18,10 @@ class IpcHelper {
     on(channel: string) {
         return (callback: (event: IpcRendererEvent, args: CvatTrackData) => void) => this.ipcRenderer.on(channel, callback);
     }
+
+    send(channel: string) {
+        return (...args: unknown[]) => this.ipcRenderer.send(channel, ...args);
+    }
 }
 
 const ipcHelper = new IpcHelper(ipcRenderer);
@@ -35,6 +39,13 @@ const bridge: Bridge = {
     startTrack: ipcHelper.invoke("start-track"),
     stopTrack: ipcHelper.invoke("stop-track"),
     onTrack: ipcHelper.on("track"),
+
+    checkForUpdates: ipcHelper.invoke("check-for-updates"),
+    toggleAlwaysOnTop: ipcHelper.send("toggle-always-on-top"),
+    openDevTools: ipcHelper.send("open-devtools"),
+    minimize: ipcHelper.send("minimize"),
+    toggleMaximize: ipcHelper.send("toggle-maximize"),
+    appQuit: ipcHelper.send("app-quit"),
 };
 
 if (process.contextIsolated) {
