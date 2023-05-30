@@ -17,38 +17,21 @@ jobs:
         steps:
             - name: Check out Git repository
               uses: actions/checkout@v3
+            # https://github.com/electron-userland/electron-builder/issues/6933#issuecomment-1213438889
             - name: Install pnpm
               uses: pnpm/action-setup@v2
               with:
-                  version: 8
+                  version: 8.3.1
 
             - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v3
               with:
                   node-version: ${{ matrix.node-version }}
-                  cache: "pnpm"
-
-            # - name: Install pnpm
-            #   uses: pnpm/action-setup@v2
-            #   with:
-            #       version: latest
-            #       run_install: false
-
-            # - name: Get pnpm store directory
-            #   id: pnpm-cache
-            #   run: |
-            #       echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-
-            # - uses: actions/cache@v3
-            #   name: Setup pnpm cache
-            #   with:
-            #       path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-            #       key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-            #       restore-keys: |
-            #           ${{ runner.os }}-pnpm-store-
+                  # cache: "pnpm" # 임시 캐시 사용하지 않도록 수정
 
             - name: Install dependencies
-              run: pnpm install
+              shell: bash
+              run: pnpm install --frozen-lockfile
 
             - name: build-linux
               if: matrix.os == 'ubuntu-latest'
