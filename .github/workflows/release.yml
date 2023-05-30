@@ -13,15 +13,32 @@ jobs:
             matrix:
                 os: [windows-latest] # ubuntu-latest, macos-latest
                 node-version: [18]
+                pnpm-version: [8.5.1]
 
         steps:
             - name: Check out Git repository
               uses: actions/checkout@v3
             # https://github.com/electron-userland/electron-builder/issues/6933#issuecomment-1213438889
-            # - name: Install pnpm
-            #   uses: pnpm/action-setup@v2
-            #   with:
-            #       version: 8.3.1
+            - name: Install pnpm
+              uses: pnpm/action-setup@v2
+              with:
+                  version: ${{ matrix.pnpm-version }}
+
+            - name: Modify pnpm.cjs shebang
+              if: matrix.os == 'windows-latest'
+              shell: bash
+              run: | # sed -i '1s|#!/usr/bin/env node|#!node|' C:\Users\runneradmin\setup-pnpm\node_modules\.pnpm\pnpm@${{ matrix.pnpm-version }}\node_modules\pnpm\bin\pnpm.cjs
+                  set "file=C:\Users\runneradmin\setup-pnpm\node_modules\.pnpm\pnpm@${{ matrix.pnpm-version }}\node_modules\pnpm\bin\pnpm.cjs"
+                  for /f "tokens=1* delims=:" %%A in ('findstr /n "^" "%file%"') do (
+                      set "line=%%B"
+                      if "%%A"=="1" (
+                          echo #!node> "%file%.tmp"
+                      ) else (
+                          echo !line!>> "%file%.tmp"
+                      )
+                  )
+
+                  move /y "%file%.tmp" "%file%"
 
             - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v3
@@ -31,19 +48,19 @@ jobs:
 
             - name: Install dependencies
               shell: bash
-              run: npm install
+              run: pnpm install
 
             - name: build-linux
               if: matrix.os == 'ubuntu-latest'
-              run: npm run build:linux
+              run: pnpm run build:linux
 
             - name: build-mac
               if: matrix.os == 'macos-latest'
-              run: npm run build:mac
+              run: pnpm run build:mac
 
             - name: build-win
               if: matrix.os == 'windows-latest'
-              run: npm run build:win
+              run: pnpm run build:win
 
             - name: release
               uses: softprops/action-gh-release@v1
