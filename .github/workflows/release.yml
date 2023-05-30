@@ -7,13 +7,15 @@ on:
 
 jobs:
     release:
+        name: Build And Release
         runs-on: ${{ matrix.os }}
-
         strategy:
             matrix:
                 os: [windows-latest] # ubuntu-latest, macos-latest
                 node-version: [18]
                 pnpm-version: [8.5.1]
+        permissions:
+            contents: write
 
         steps:
             - name: Check out Git repository
@@ -34,7 +36,7 @@ jobs:
               uses: actions/setup-node@v3
               with:
                   node-version: ${{ matrix.node-version }}
-                  # cache: "pnpm" # 임시 캐시 사용하지 않도록 수정
+                  cache: "pnpm"
 
             - name: Install dependencies
               shell: bash
