@@ -18,16 +18,17 @@ jobs:
         steps:
             - name: Check out Git repository
               uses: actions/checkout@v3
-            # https://github.com/electron-userland/electron-builder/issues/6933#issuecomment-1213438889
+
             - name: Install pnpm
               uses: pnpm/action-setup@v2
               with:
                   version: ${{ matrix.pnpm-version }}
 
+            # https://github.com/electron-userland/electron-builder/issues/6933#issuecomment-1213438889
             - name: Modify pnpm.cjs shebang
               if: matrix.os == 'windows-latest'
               shell: bash
-              run: sed -i '1s|#!/usr/bin/env node|#!node|' C:\Users\runneradmin\setup-pnpm\node_modules\.pnpm\pnpm@${{ matrix.pnpm-version }}\node_modules\pnpm\bin\pnpm.cjs
+              run: sed -i '1s|#!/usr/bin/env node|#!node|' C:/Users/runneradmin/setup-pnpm/node_modules/.pnpm/pnpm@${{ matrix.pnpm-version }}/node_modules/pnpm/bin/pnpm.cjs
 
             - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v3
