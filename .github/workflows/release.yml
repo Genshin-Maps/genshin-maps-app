@@ -27,18 +27,7 @@ jobs:
             - name: Modify pnpm.cjs shebang
               if: matrix.os == 'windows-latest'
               shell: bash
-              run: | # sed -i '1s|#!/usr/bin/env node|#!node|' C:\Users\runneradmin\setup-pnpm\node_modules\.pnpm\pnpm@${{ matrix.pnpm-version }}\node_modules\pnpm\bin\pnpm.cjs
-                  set "file=C:\Users\runneradmin\setup-pnpm\node_modules\.pnpm\pnpm@${{ matrix.pnpm-version }}\node_modules\pnpm\bin\pnpm.cjs"
-                  for /f "tokens=1* delims=:" %%A in ('findstr /n "^" "%file%"') do (
-                      set "line=%%B"
-                      if "%%A"=="1" (
-                          echo #!node> "%file%.tmp"
-                      ) else (
-                          echo !line!>> "%file%.tmp"
-                      )
-                  )
-
-                  move /y "%file%.tmp" "%file%"
+              run: sed -i '1s|#!/usr/bin/env node|#!node|' C:\Users\runneradmin\setup-pnpm\node_modules\.pnpm\pnpm@${{ matrix.pnpm-version }}\node_modules\pnpm\bin\pnpm.cjs
 
             - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v3
